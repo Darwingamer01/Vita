@@ -1,42 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+  Even though we are not using Tailwind classes for everything, 
+  we keep the directives in case we need utility classes.
+  But primarily we will use these CSS Variables.
+*/
+
 :root {
+  /* Brand Colors - Brightened */
+  --primary: #f87171;
+  /* Red-400 for pop, or keep Red-500 #ef4444? Let's go vivid #ef4444 */
+  --primary: #ef4444;
+  --primary-hover: #dc2626;
+  --secondary: #3b82f6;
+  --accent: #10b981;
+
+  /* Backgrounds */
   --background: #ffffff;
-  --foreground: #171717;
+  --surface: #f8fafc;
+  /* Slate-50 - Cooler/Bright */
+  --surface-card: #ffffff;
+
+  /* Text */
+  --foreground: #111827;
+  /* Gray-900 */
+  --foreground-muted: #4b5563;
+  /* Gray-600 - Darker/Visible */
+
+  /* Borders */
+  --border: #e2e8f0;
+  /* Slate-200 */
+
+  /* Status - Vibrant */
+  --status-available: #10b981;
+  --status-busy: #f59e0b;
+  --status-unavailable: #ef4444;
+
+  /* Map Markers */
+  --marker-blood: #ef4444;
+  --marker-oxygen: #3b82f6;
+  --marker-ambulance: #f59e0b;
+  --marker-shelter: #10b981;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0f172a;
+    /* Slate-900 - Richer, brighter dark */
+    --surface: #1e293b;
+    /* Slate-800 - Lighter surface */
+    --surface-card: #334155;
+    /* Slate-700 - Visible cards */
+    --foreground: #f8fafc;
+    /* Slate-50 - Bright White */
+    --foreground-muted: #94a3b8;
+    /* Slate-400 - Readable gray */
+    --border: #475569;
+    /* Slate-600 - Visible borders */
   }
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+/* Manual Dark Mode Override */
+.dark {
+  --background: #0f172a;
+  --surface: #1e293b;
+  --surface-card: #334155;
+  --foreground: #f8fafc;
+  --foreground-muted: #94a3b8;
+  /* Gray-300 */
+  --border: #475569;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+/* Utilities */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  font-size: 1rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+}
+
+.btn-outline:hover {
+  background-color: var(--surface);
+}
+
+.card {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.badge {
+  display: inline-flex;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Map specific */
+.map-container {
+  height: 100%;
+  min-height: 400px;
+  width: 100%;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  z-index: 1;
 }

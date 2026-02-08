@@ -1,0 +1,373 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "VITA" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img [ref=e6]
+        - text: VITA
+      - generic [ref=e9]:
+        - link "Login" [ref=e10] [cursor=pointer]:
+          - /url: /login
+        - link "Sign Up" [ref=e11] [cursor=pointer]:
+          - /url: /signup
+          - button "Sign Up" [ref=e12]:
+            - img [ref=e14]
+            - generic [ref=e18]: Sign Up
+  - region "Notifications alt+T"
+  - main [ref=e19]:
+    - generic [ref=e21]:
+      - generic [ref=e37]:
+        - generic [ref=e38]: v4.0 Ultimate Edition Live
+        - heading "VITA SAVES LIVES FAST." [level=1] [ref=e42]:
+          - text: VITA SAVES
+          - generic [ref=e44]: LIVES FAST.
+        - paragraph [ref=e45]: One unified network for every emergency. Real-time. Intelligent. Verified.
+        - link "Get Started Now" [ref=e47] [cursor=pointer]:
+          - /url: /signup
+          - button "Get Started Now" [ref=e48]:
+            - img [ref=e50]
+            - generic [ref=e55]:
+              - text: Get Started Now
+              - img [ref=e56]
+      - generic [ref=e58]:
+        - paragraph [ref=e60]: Trusted by 50+ Networks
+        - generic [ref=e64]:
+          - generic [ref=e65]: APOLLO HOSPITALS
+          - generic [ref=e66]: AIIMS DELHI
+          - generic [ref=e67]: FORTIS HEALTHCARE
+          - generic [ref=e68]: MAX SUPER SPECIALITY
+          - generic [ref=e69]: MEDANTA
+          - generic [ref=e70]: MANIPAL HOSPITALS
+          - generic [ref=e71]: NH NARAYANA
+          - generic [ref=e72]: KOKILABEN AMBANI
+          - generic [ref=e73]: LILAVATI HOSPITAL
+          - generic [ref=e74]: APOLLO HOSPITALS
+          - generic [ref=e75]: AIIMS DELHI
+          - generic [ref=e76]: FORTIS HEALTHCARE
+          - generic [ref=e77]: MAX SUPER SPECIALITY
+          - generic [ref=e78]: MEDANTA
+          - generic [ref=e79]: MANIPAL HOSPITALS
+          - generic [ref=e80]: NH NARAYANA
+          - generic [ref=e81]: KOKILABEN AMBANI
+          - generic [ref=e82]: LILAVATI HOSPITAL
+          - generic [ref=e83]: APOLLO HOSPITALS
+          - generic [ref=e84]: AIIMS DELHI
+          - generic [ref=e85]: FORTIS HEALTHCARE
+          - generic [ref=e86]: MAX SUPER SPECIALITY
+          - generic [ref=e87]: MEDANTA
+          - generic [ref=e88]: MANIPAL HOSPITALS
+          - generic [ref=e89]: NH NARAYANA
+          - generic [ref=e90]: KOKILABEN AMBANI
+          - generic [ref=e91]: LILAVATI HOSPITAL
+      - generic [ref=e92]:
+        - generic [ref=e94]:
+          - generic [ref=e95]:
+            - img [ref=e97]
+            - heading "God-Mode Visibility." [level=2] [ref=e101]:
+              - text: God-Mode
+              - text: Visibility.
+            - paragraph [ref=e102]: The fog of war is gone. Identify critical resources with sub-second latency across 18 unique infrastructure layers.
+            - list [ref=e103]:
+              - listitem [ref=e104]:
+                - img [ref=e106]
+                - text: Real-time Availability
+              - listitem [ref=e109]:
+                - img [ref=e111]
+                - text: Route Optimization
+              - listitem [ref=e114]:
+                - img [ref=e116]
+                - text: Infrastructure Heatmaps
+            - link "Explore Master Map" [ref=e119] [cursor=pointer]:
+              - /url: /signup
+              - text: Explore Master Map
+              - img [ref=e120]
+          - img "Vita Live Map Dashboard" [ref=e126]
+        - generic [ref=e128]:
+          - img "Vita AI Assistant" [ref=e133]
+          - generic [ref=e134]:
+            - img [ref=e136]
+            - heading "Neural Prediction." [level=2] [ref=e151]:
+              - text: Neural
+              - text: Prediction.
+            - paragraph [ref=e152]: Processing millions of data points to predict shortages and triage patients before they even reach the ER.
+            - link "Analyze AI Insights" [ref=e153] [cursor=pointer]:
+              - /url: /signup
+              - text: Analyze AI Insights
+              - img [ref=e154]
+        - generic [ref=e156]:
+          - generic [ref=e157]:
+            - heading "The Complete Ecosystem" [level=2] [ref=e158]
+            - paragraph [ref=e159]: Connected intelligence for every stakeholder.
+          - list [ref=e161]:
+            - generic [ref=e163] [cursor=pointer]:
+              - generic [ref=e164]:
+                - generic [ref=e165]:
+                  - img "God-Mode Visibility." [ref=e166]
+                  - img [ref=e169]
+                - heading "God-Mode Visibility." [level=3] [ref=e171]
+                - paragraph [ref=e172]: The fog of war is gone. Identify critical resources with sub-second latency.
+              - button "Explore Master Map" [ref=e173]
+            - generic [ref=e175] [cursor=pointer]:
+              - generic [ref=e176]:
+                - generic [ref=e177]:
+                  - img "Doctors Available NOW" [ref=e178]
+                  - img [ref=e181]
+                - heading "Doctors Available NOW" [level=3] [ref=e185]
+                - paragraph [ref=e186]: Cardio, Neuro, and Peds specialists on-call.
+              - button "Find Doctors" [ref=e187]
+            - generic [ref=e189] [cursor=pointer]:
+              - generic [ref=e190]:
+                - generic [ref=e191]:
+                  - img "Blood & Oxygen" [ref=e192]
+                  - img [ref=e195]
+                - heading "Blood & Oxygen" [level=3] [ref=e197]
+                - paragraph [ref=e198]: Live stock from verified banks. Filter by distance.
+              - button "Check Stock" [ref=e199]
+            - generic [ref=e201] [cursor=pointer]:
+              - generic [ref=e202]:
+                - generic [ref=e203]:
+                  - img "Ambulance & Beds" [ref=e204]
+                  - img [ref=e207]
+                - heading "Ambulance & Beds" [level=3] [ref=e212]
+                - paragraph [ref=e213]: ICU/Ventilator availability in real-time.
+              - button "Find Bed/Amb" [ref=e214]
+            - generic [ref=e216] [cursor=pointer]:
+              - generic [ref=e217]:
+                - generic [ref=e218]:
+                  - img "Neural Prediction." [ref=e219]
+                  - img [ref=e222]
+                - heading "Neural Prediction." [level=3] [ref=e224]
+                - paragraph [ref=e225]: Processing millions of data points to predict shortages.
+              - button "Try AI" [ref=e226]
+            - generic [ref=e228] [cursor=pointer]:
+              - generic [ref=e229]:
+                - generic [ref=e230]:
+                  - img "Community Lifeline" [ref=e231]
+                  - img [ref=e234]
+                - heading "Community Lifeline" [level=3] [ref=e239]
+                - paragraph [ref=e240]: Broadcast SOS requests. Connect with local volunteers.
+              - button "View Requests" [ref=e241]
+      - generic [ref=e247]:
+        - heading "Emergency? Don't Wait." [level=2] [ref=e248]:
+          - text: Emergency?
+          - text: Don't Wait.
+        - paragraph [ref=e249]: Skip the login. Trigger the network immediately.
+        - generic [ref=e250]:
+          - button "TRIGGER SOS" [ref=e251] [cursor=pointer]:
+            - img [ref=e253]
+            - generic [ref=e258]:
+              - img [ref=e259]
+              - text: TRIGGER SOS
+          - button "Chat with AI" [ref=e264] [cursor=pointer]:
+            - img [ref=e266]
+            - generic [ref=e271]:
+              - img [ref=e272]
+              - text: Chat with AI
+      - generic [ref=e274]:
+        - generic [ref=e275]:
+          - heading "Voices form the Frontlines" [level=2] [ref=e276]
+          - paragraph [ref=e277]: Real stories from survivors, doctors, and volunteers.
+        - generic [ref=e281]:
+          - generic [ref=e282]:
+            - paragraph [ref=e283]: "\"This app saved my father's life during the blackout. We found an oxygen cylinder within 2 minutes when every hospital line was busy.\""
+            - generic [ref=e284]:
+              - img "Sarah Chen" [ref=e286]
+              - generic [ref=e287]:
+                - heading "Sarah Chen" [level=4] [ref=e288]
+                - paragraph [ref=e289]: Survivor, Mumbai
+          - generic [ref=e290]:
+            - paragraph [ref=e291]: "\"The God-Mode visibility is insane. As a fleet manager, I coordinated 4 ambulances through the flood zones using the real-time heatmaps.\""
+            - generic [ref=e292]:
+              - img "Michael Rodriguez" [ref=e294]
+              - generic [ref=e295]:
+                - heading "Michael Rodriguez" [level=4] [ref=e296]
+                - paragraph [ref=e297]: Ambulance Fleet Coordinator
+          - generic [ref=e298]:
+            - paragraph [ref=e299]: "\"Doctors picking up video triage calls in 30 seconds? This is the future of emergency healthcare. I can assess patients before they even arrive.\""
+            - generic [ref=e300]:
+              - img "Dr. Emily Watson" [ref=e302]
+              - generic [ref=e303]:
+                - heading "Dr. Emily Watson" [level=4] [ref=e304]
+                - paragraph [ref=e305]: Chief of Surgery, Apollo
+          - generic [ref=e306]:
+            - paragraph [ref=e307]: "\"The Neural Prediction engine alerted us to the bed shortage 2 hours before the surge hit. We were ready. Pure genius.\""
+            - generic [ref=e308]:
+              - img "Karan Patel" [ref=e310]
+              - generic [ref=e311]:
+                - heading "Karan Patel" [level=4] [ref=e312]
+                - paragraph [ref=e313]: Hospital Administrator
+          - generic [ref=e314]:
+            - paragraph [ref=e315]: "\"When the grid went down, the Community Lifeline helped me find food for my elderly neighbors. It restores your faith in humanity.\""
+            - generic [ref=e316]:
+              - img "Lisa Wang" [ref=e318]
+              - generic [ref=e319]:
+                - heading "Lisa Wang" [level=4] [ref=e320]
+                - paragraph [ref=e321]: Community Volunteer
+          - generic [ref=e322]:
+            - paragraph [ref=e323]: "\"This app saved my father's life during the blackout. We found an oxygen cylinder within 2 minutes when every hospital line was busy.\""
+            - generic [ref=e324]:
+              - img "Sarah Chen" [ref=e326]
+              - generic [ref=e327]:
+                - heading "Sarah Chen" [level=4] [ref=e328]
+                - paragraph [ref=e329]: Survivor, Mumbai
+          - generic [ref=e330]:
+            - paragraph [ref=e331]: "\"The God-Mode visibility is insane. As a fleet manager, I coordinated 4 ambulances through the flood zones using the real-time heatmaps.\""
+            - generic [ref=e332]:
+              - img "Michael Rodriguez" [ref=e334]
+              - generic [ref=e335]:
+                - heading "Michael Rodriguez" [level=4] [ref=e336]
+                - paragraph [ref=e337]: Ambulance Fleet Coordinator
+          - generic [ref=e338]:
+            - paragraph [ref=e339]: "\"Doctors picking up video triage calls in 30 seconds? This is the future of emergency healthcare. I can assess patients before they even arrive.\""
+            - generic [ref=e340]:
+              - img "Dr. Emily Watson" [ref=e342]
+              - generic [ref=e343]:
+                - heading "Dr. Emily Watson" [level=4] [ref=e344]
+                - paragraph [ref=e345]: Chief of Surgery, Apollo
+          - generic [ref=e346]:
+            - paragraph [ref=e347]: "\"The Neural Prediction engine alerted us to the bed shortage 2 hours before the surge hit. We were ready. Pure genius.\""
+            - generic [ref=e348]:
+              - img "Karan Patel" [ref=e350]
+              - generic [ref=e351]:
+                - heading "Karan Patel" [level=4] [ref=e352]
+                - paragraph [ref=e353]: Hospital Administrator
+          - generic [ref=e354]:
+            - paragraph [ref=e355]: "\"When the grid went down, the Community Lifeline helped me find food for my elderly neighbors. It restores your faith in humanity.\""
+            - generic [ref=e356]:
+              - img "Lisa Wang" [ref=e358]
+              - generic [ref=e359]:
+                - heading "Lisa Wang" [level=4] [ref=e360]
+                - paragraph [ref=e361]: Community Volunteer
+          - generic [ref=e362]:
+            - paragraph [ref=e363]: "\"This app saved my father's life during the blackout. We found an oxygen cylinder within 2 minutes when every hospital line was busy.\""
+            - generic [ref=e364]:
+              - img "Sarah Chen" [ref=e366]
+              - generic [ref=e367]:
+                - heading "Sarah Chen" [level=4] [ref=e368]
+                - paragraph [ref=e369]: Survivor, Mumbai
+          - generic [ref=e370]:
+            - paragraph [ref=e371]: "\"The God-Mode visibility is insane. As a fleet manager, I coordinated 4 ambulances through the flood zones using the real-time heatmaps.\""
+            - generic [ref=e372]:
+              - img "Michael Rodriguez" [ref=e374]
+              - generic [ref=e375]:
+                - heading "Michael Rodriguez" [level=4] [ref=e376]
+                - paragraph [ref=e377]: Ambulance Fleet Coordinator
+          - generic [ref=e378]:
+            - paragraph [ref=e379]: "\"Doctors picking up video triage calls in 30 seconds? This is the future of emergency healthcare. I can assess patients before they even arrive.\""
+            - generic [ref=e380]:
+              - img "Dr. Emily Watson" [ref=e382]
+              - generic [ref=e383]:
+                - heading "Dr. Emily Watson" [level=4] [ref=e384]
+                - paragraph [ref=e385]: Chief of Surgery, Apollo
+          - generic [ref=e386]:
+            - paragraph [ref=e387]: "\"The Neural Prediction engine alerted us to the bed shortage 2 hours before the surge hit. We were ready. Pure genius.\""
+            - generic [ref=e388]:
+              - img "Karan Patel" [ref=e390]
+              - generic [ref=e391]:
+                - heading "Karan Patel" [level=4] [ref=e392]
+                - paragraph [ref=e393]: Hospital Administrator
+          - generic [ref=e394]:
+            - paragraph [ref=e395]: "\"When the grid went down, the Community Lifeline helped me find food for my elderly neighbors. It restores your faith in humanity.\""
+            - generic [ref=e396]:
+              - img "Lisa Wang" [ref=e398]
+              - generic [ref=e399]:
+                - heading "Lisa Wang" [level=4] [ref=e400]
+                - paragraph [ref=e401]: Community Volunteer
+          - generic [ref=e402]:
+            - paragraph [ref=e403]: "\"This app saved my father's life during the blackout. We found an oxygen cylinder within 2 minutes when every hospital line was busy.\""
+            - generic [ref=e404]:
+              - img "Sarah Chen" [ref=e406]
+              - generic [ref=e407]:
+                - heading "Sarah Chen" [level=4] [ref=e408]
+                - paragraph [ref=e409]: Survivor, Mumbai
+          - generic [ref=e410]:
+            - paragraph [ref=e411]: "\"The God-Mode visibility is insane. As a fleet manager, I coordinated 4 ambulances through the flood zones using the real-time heatmaps.\""
+            - generic [ref=e412]:
+              - img "Michael Rodriguez" [ref=e414]
+              - generic [ref=e415]:
+                - heading "Michael Rodriguez" [level=4] [ref=e416]
+                - paragraph [ref=e417]: Ambulance Fleet Coordinator
+          - generic [ref=e418]:
+            - paragraph [ref=e419]: "\"Doctors picking up video triage calls in 30 seconds? This is the future of emergency healthcare. I can assess patients before they even arrive.\""
+            - generic [ref=e420]:
+              - img "Dr. Emily Watson" [ref=e422]
+              - generic [ref=e423]:
+                - heading "Dr. Emily Watson" [level=4] [ref=e424]
+                - paragraph [ref=e425]: Chief of Surgery, Apollo
+          - generic [ref=e426]:
+            - paragraph [ref=e427]: "\"The Neural Prediction engine alerted us to the bed shortage 2 hours before the surge hit. We were ready. Pure genius.\""
+            - generic [ref=e428]:
+              - img "Karan Patel" [ref=e430]
+              - generic [ref=e431]:
+                - heading "Karan Patel" [level=4] [ref=e432]
+                - paragraph [ref=e433]: Hospital Administrator
+          - generic [ref=e434]:
+            - paragraph [ref=e435]: "\"When the grid went down, the Community Lifeline helped me find food for my elderly neighbors. It restores your faith in humanity.\""
+            - generic [ref=e436]:
+              - img "Lisa Wang" [ref=e438]
+              - generic [ref=e439]:
+                - heading "Lisa Wang" [level=4] [ref=e440]
+                - paragraph [ref=e441]: Community Volunteer
+      - generic [ref=e443]:
+        - generic [ref=e444]:
+          - generic [ref=e445]:
+            - link "VITA" [ref=e446] [cursor=pointer]:
+              - /url: /
+              - img [ref=e448]
+              - text: VITA
+            - paragraph [ref=e450]:
+              - text: Data-driven emergency response.
+              - text: Built for the future of healthcare.
+          - generic [ref=e451]:
+            - heading "Platform" [level=4] [ref=e452]
+            - list [ref=e453]:
+              - listitem [ref=e454]:
+                - link "About Us" [ref=e455] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e456]:
+                - link "Login" [ref=e457] [cursor=pointer]:
+                  - /url: /login
+              - listitem [ref=e458]:
+                - link "Sign Up" [ref=e459] [cursor=pointer]:
+                  - /url: /signup
+          - generic [ref=e460]:
+            - heading "Legal" [level=4] [ref=e461]
+            - list [ref=e462]:
+              - listitem [ref=e463]:
+                - link "Privacy Policy" [ref=e464] [cursor=pointer]:
+                  - /url: /privacy
+              - listitem [ref=e465]:
+                - link "Terms" [ref=e466] [cursor=pointer]:
+                  - /url: /terms
+        - generic [ref=e467]: © 2026 Vita Emergency Network.
+      - generic [ref=e468]:
+        - generic [ref=e469]:
+          - generic [ref=e472]:
+            - img [ref=e475]
+            - generic [ref=e479]:
+              - heading "Vee" [level=3] [ref=e480]
+              - paragraph [ref=e481]: Medical Assistant
+          - button [ref=e482] [cursor=pointer]:
+            - img [ref=e483]
+        - generic [ref=e486]:
+          - generic [ref=e487]:
+            - generic [ref=e488]: Vee
+            - generic [ref=e489]:
+              - generic [ref=e490]: Hi there! I'm Vee, your personal health assistant. How can I help you? (Try "Need blood", "oxygen", or "ambulance")
+              - generic [ref=e491]: 06:08 PM
+          - generic [ref=e493]:
+            - generic [ref=e494]: I need oxygen
+            - generic [ref=e495]: 06:09 PM
+          - generic [ref=e497]: Vee
+        - generic [ref=e504]:
+          - img [ref=e506]
+          - textbox "Type your emergency..." [ref=e509]
+          - button [disabled] [ref=e510]:
+            - img [ref=e511]
+  - button "Open Next.js Dev Tools" [ref=e519] [cursor=pointer]:
+    - img [ref=e520]
+  - alert [ref=e523]
+```
