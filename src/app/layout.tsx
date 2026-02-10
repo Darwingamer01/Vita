@@ -4,8 +4,9 @@ import "./globals.css";
 import Navbar from "@/components/common/Navbar";
 import { LanguageProvider } from "@/lib/i18n";
 import AuthProvider from "@/components/providers/AuthProvider";
-
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { LocationProvider } from "@/contexts/LocationContext";
+import LocationPermissionModal from "@/components/features/LocationPermissionModal";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,14 +28,17 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased selection:bg-blue-500/30`}>
         <ThemeProvider defaultTheme="system">
           <AuthProvider>
-            <LanguageProvider>
-              <Navbar />
-              <AlertBanner />
-              <Toaster position="top-center" />
-              <main className="min-h-[calc(100vh-64px)]">
-                {children}
-              </main>
-            </LanguageProvider>
+            <LocationProvider>
+              <LanguageProvider>
+                <Navbar />
+                <AlertBanner />
+                <LocationPermissionModal />
+                <Toaster position="top-center" />
+                <main className="min-h-[calc(100vh-64px)]">
+                  {children}
+                </main>
+              </LanguageProvider>
+            </LocationProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

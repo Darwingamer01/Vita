@@ -31,7 +31,10 @@ import {
     MapPin,
     AlignLeft,
     AlertCircle,
-    Radio
+    Radio,
+    Trash2,
+    Truck,
+    Clock
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -45,6 +48,7 @@ import { FloatingDock } from '@/components/ui/floating-dock';
 import ChatWidget from '@/components/features/ChatWidget';
 import EmergencyButton from '@/components/features/EmergencyButton';
 import SettingsPanel from '@/components/features/Settings/SettingsPanel';
+import EmergencyContactModal from '@/components/features/EmergencyContactModal';
 import { RequestTimeline, AIMatches, StatusControl } from '@/components/features/RequestLifecycle';
 import { Request, ResourceType, UrgencyLevel, RequestStatus, Resource } from '@/types';
 
@@ -261,6 +265,119 @@ function DashboardContent() {
         }
     };
 
+    // --- Resource Modal Logic ---
+    const [isResourceModalOpen, setIsResourceModalOpen] = useState(false);
+    const [resourceFormData, setResourceFormData] = useState({
+        title: '',
+        type: 'HOSPITAL' as ResourceType,
+        description: '',
+        location: {
+            lat: 28.61, // Default to Delhi (or user location)
+            lng: 77.23,
+            address: '',
+            city: '',
+            district: ''
+        },
+        contact: {
+            phone: '',
+            email: ''
+        },
+        specialty: '', // New Field
+        hospitalBeds: {
+            general: 0,
+            icuVentilator: 0
+        },
+        isVerified: false,
+        bloodStock: {
+            'A+': 0, 'A-': 0, 'B+': 0, 'B-': 0, 'AB+': 0, 'AB-': 0, 'O+': 0, 'O-': 0
+        },
+        bloodFeatures: {
+            plasma: false,
+            apheresis: false
+        },
+        ambulanceType: 'BASIC',
+        oxygenType: 'CYLINDER',
+        operatingHours: ''
+    });
+
+    const handleSaveResource = async () => {
+        if (!resourceFormData.title || !resourceFormData.location.city) {
+            alert("Please fill in at least Title and City");
+            return;
+        }
+
+        // Prepare Metadata based on Type
+        let metadata = {};
+        if (resourceFormData.type === 'DOCTOR' && resourceFormData.specialty) {
+            metadata = {
+                doctor: {
+                    specialty: resourceFormData.specialty,
+                    qualification: 'MBBS, MD', // Default or add field
+                    experienceYears: 5,
+                    availableToday: true
+                }
+            };
+        } else if (resourceFormData.type === 'HOSPITAL') {
+            metadata = {
+                hospital: {
+                    beds: {
+                        general: resourceFormData.hospitalBeds.general,
+                        icu: resourceFormData.hospitalBeds.icuVentilator,
+                        ventilator: 0, // Simplified for UI
+                        oxygen: 0
+                    },
+                    specialties: [],
+                    insuranceAccepted: [],
+                    ayushmanBharat: true
+                }
+            };
+        } else if (resourceFormData.type === 'BLOOD_BANK') {
+            metadata = {
+                bloodStock: {
+                    groups: resourceFormData.bloodStock,
+                    plasmaAvailable: resourceFormData.bloodFeatures.plasma,
+                    apheresisAvailable: resourceFormData.bloodFeatures.apheresis
+                }
+            };
+        } else if (resourceFormData.type === 'AMBULANCE') {
+            metadata = {
+                ambulanceType: resourceFormData.ambulanceType,
+                operatingHours: resourceFormData.operatingHours || '24x7'
+            };
+        } else if (resourceFormData.type === 'OXYGEN') {
+            metadata = {
+                oxygenType: resourceFormData.oxygenType,
+                operatingHours: resourceFormData.operatingHours || '24x7'
+            };
+        }
+
+        try {
+            const res = await fetch('/api/resources', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...resourceFormData,
+                    verificationLevel: resourceFormData.isVerified ? 'VERIFIED' : 'UNVERIFIED',
+                    metadata // Attach calculated metadata
+                })
+            });
+
+            if (res.ok) {
+                setIsResourceModalOpen(false);
+                // Refresh resources
+                const r = await fetch('/api/resources');
+                const d = await r.json();
+                setResources(d);
+                alert('Resource added successfully!');
+            } else {
+                alert('Failed to add resource');
+            }
+        } catch (error) {
+            console.error('Failed to save resource:', error);
+            alert('Error saving resource');
+        }
+    };
+
     return (
         <div className="flex h-screen bg-[#F3F4F6] dark:bg-slate-950 overflow-hidden">
             {/* SIDEBAR */}
@@ -311,10 +428,63 @@ function DashboardContent() {
                                 type="text"
                                 placeholder="Search resources, medicines, or hospitals..."
                                 value={globalSearch}
-                                onChange={(e) => setGlobalSearch(e.target.value)}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setGlobalSearch(val);
+
+                                    // Intelligent Routing
+                                    const lowerVal = val.toLowerCase();
+                                    if (lowerVal.includes('doctor') || lowerVal.includes('dr')) setActiveTab('doctor');
+                                    else if (lowerVal.includes('hospital') || lowerVal.includes('clinic')) setActiveTab('hospital');
+                                    else if (lowerVal.includes('medicine') || lowerVal.includes('drug') || lowerVal.includes('pharma')) setActiveTab('medicine');
+                                    else if (lowerVal.includes('blood')) setActiveTab('blood');
+                                    else if (lowerVal.includes('ambulance')) setActiveTab('ambulance');
+                                    else if (lowerVal.includes('oxygen')) setActiveTab('oxygen');
+                                    else if (lowerVal.includes('shelter')) setActiveTab('shelter');
+                                    else if (lowerVal.includes('request') || lowerVal.includes('help')) setActiveTab('requests');
+                                }}
                                 className="w-full pl-10 pr-10 py-2.5 bg-gray-100 dark:bg-slate-800 border-none rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:text-gray-900 dark:focus:text-white transition-all shadow-inner focus:shadow-none"
                             />
-                            <button className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-gray-200 text-gray-400 hover:text-gray-700 transition-colors">
+                            <button
+                                onClick={() => {
+                                    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                                        // @ts-ignore
+                                        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                                        const recognition = new SpeechRecognition();
+                                        recognition.lang = 'en-US';
+                                        recognition.start();
+
+                                        recognition.onstart = () => {
+                                            const btn = document.getElementById('mic-btn');
+                                            if (btn) btn.classList.add('text-red-500', 'animate-pulse');
+                                        };
+
+                                        recognition.onresult = (event: any) => {
+                                            const transcript = event.results[0][0].transcript;
+                                            setGlobalSearch(transcript);
+                                            // Trigger routing logic manually since setGlobalSearch is async/doesn't trigger onChange
+                                            const lowerVal = transcript.toLowerCase();
+                                            if (lowerVal.includes('doctor') || lowerVal.includes('dr')) setActiveTab('doctor');
+                                            else if (lowerVal.includes('hospital') || lowerVal.includes('clinic')) setActiveTab('hospital');
+                                            else if (lowerVal.includes('medicine') || lowerVal.includes('drug') || lowerVal.includes('pharma')) setActiveTab('medicine');
+                                            else if (lowerVal.includes('blood')) setActiveTab('blood');
+                                            else if (lowerVal.includes('ambulance')) setActiveTab('ambulance');
+                                            else if (lowerVal.includes('oxygen')) setActiveTab('oxygen');
+                                            else if (lowerVal.includes('shelter')) setActiveTab('shelter');
+                                            else if (lowerVal.includes('request') || lowerVal.includes('help')) setActiveTab('requests');
+                                        };
+
+                                        recognition.onend = () => {
+                                            const btn = document.getElementById('mic-btn');
+                                            if (btn) btn.classList.remove('text-red-500', 'animate-pulse');
+                                        };
+                                    } else {
+                                        alert('Voice search not supported in this browser.');
+                                    }
+                                }}
+                                id="mic-btn"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors"
+                            >
                                 <Mic size={16} />
                             </button>
                         </div>
@@ -322,6 +492,14 @@ function DashboardContent() {
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => setIsResourceModalOpen(true)}
+                            className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold transition-all shadow-lg shadow-blue-200"
+                        >
+                            <Plus size={16} />
+                            <span className="hidden sm:inline">Add Resource</span>
+                        </button>
+
                         <div className="relative">
                             <button
                                 onClick={() => setShowNotifications(!showNotifications)}
@@ -481,67 +659,6 @@ function DashboardContent() {
 
                         {/* Requests Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-20 mt-6">
-                            {userRequests
-                                .filter(req => activeFilter === 'ALL' || req.type === activeFilter)
-                                .map((req) => (
-                                    <motion.div
-                                        layout
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        key={req.id}
-                                        onClick={() => setViewingRequest(req)}
-                                        className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 shadow-sm hover:shadow-md transition-all group relative cursor-pointer"
-                                    >
-                                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); handleOpenEdit(req); }}
-                                                className="p-2 bg-white border border-gray-200 shadow-sm hover:bg-blue-50 text-gray-400 hover:text-blue-600 rounded-lg transition-all"
-                                            >
-                                                <PenLine size={14} />
-                                            </button>
-                                        </div>
-
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider
-                                            ${req.urgency === 'CRITICAL' ? 'bg-red-50 text-red-600 border border-red-100' :
-                                                    req.urgency === 'HIGH' ? 'bg-orange-50 text-orange-600 border border-orange-100' :
-                                                        'bg-blue-50 text-blue-600 border border-blue-100'}`}>
-                                                {req.urgency}
-                                            </span>
-                                            <span className="text-xs font-medium text-gray-400 dark:text-slate-400">
-                                                {new Date(req.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </span>
-                                        </div>
-
-                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 leading-snug">{req.title}</h3>
-                                        <p className="text-sm text-gray-500 dark:text-slate-300 mb-5 line-clamp-2 leading-relaxed">{req.description}</p>
-
-                                        <div className="flex items-center gap-4 text-xs font-medium text-gray-500 mb-5">
-                                            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-slate-700 px-2 py-1 rounded border border-gray-100 dark:border-slate-600 dark:text-slate-200">
-                                                {req.type === 'MEDICAL' && <Stethoscope size={12} />}
-                                                {req.type === 'BLOOD_BANK' && <Heart size={12} />}
-                                                {req.type === 'AMBULANCE' && <Ambulance size={12} />}
-                                                {req.type}
-                                            </div>
-                                            <span className="dark:text-slate-400">{req.location}</span>
-                                        </div>
-
-                                        <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-slate-700">
-                                            <div className="flex items-center gap-2">
-                                                <div className={`w-2 h-2 rounded-full ${req.status === 'OPEN' ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
-                                                <span className="text-xs font-bold text-gray-700 dark:text-slate-300">{req.status}</span>
-                                            </div>
-                                            <div className="flex -space-x-2">
-                                                {[...Array(Math.min(3, req.responseCount))].map((_, i) => (
-                                                    <div key={i} className="w-6 h-6 rounded-full bg-gray-200 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[10px] font-bold text-gray-500">
-                                                        {String.fromCharCode(65 + i)}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                ))}
-
                             <button
                                 onClick={handleOpenAdd}
                                 className="border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-xl p-6 flex flex-col items-center justify-center text-gray-500 dark:text-slate-400 hover:border-blue-500 hover:text-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all group min-h-[200px]"
@@ -551,6 +668,93 @@ function DashboardContent() {
                                 </div>
                                 <span className="text-sm font-bold">New Request</span>
                             </button>
+
+                            <AnimatePresence mode="popLayout">
+                                {userRequests
+                                    .filter(req => activeFilter === 'ALL' || req.type === activeFilter)
+                                    .map((req) => (
+                                        <motion.div
+                                            layout
+                                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                                            exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                                            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                                            key={req.id}
+                                            onClick={() => setViewingRequest(req)}
+                                            className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 shadow-sm hover:shadow-md transition-all group relative cursor-pointer"
+                                        >
+                                            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex gap-2">
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleOpenEdit(req); }}
+                                                    className="p-2 bg-white border border-gray-200 shadow-sm hover:bg-blue-50 text-gray-400 hover:text-blue-600 rounded-lg transition-all"
+                                                    title="Edit"
+                                                >
+                                                    <PenLine size={14} />
+                                                </button>
+                                                <button
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation();
+                                                        if (confirm('Are you sure you want to delete this request?')) {
+                                                            try {
+                                                                const res = await fetch(`/api/requests/${req.id}`, { method: 'DELETE' });
+                                                                if (res.ok) {
+                                                                    fetchRequests();
+                                                                } else {
+                                                                    alert('Failed to delete request');
+                                                                }
+                                                            } catch (err) {
+                                                                console.error('Failed to delete', err);
+                                                            }
+                                                        }
+                                                    }}
+                                                    className="p-2 bg-white border border-gray-200 shadow-sm hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-all"
+                                                    title="Delete"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+
+                                            <div className="flex items-center gap-2 mb-4">
+                                                <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider
+                                            ${req.urgency === 'CRITICAL' ? 'bg-red-50 text-red-600 border border-red-100' :
+                                                        req.urgency === 'HIGH' ? 'bg-orange-50 text-orange-600 border border-orange-100' :
+                                                            'bg-blue-50 text-blue-600 border border-blue-100'}`}>
+                                                    {req.urgency}
+                                                </span>
+                                                <span className="text-xs font-medium text-gray-400 dark:text-slate-400">
+                                                    {new Date(req.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                            </div>
+
+                                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 leading-snug">{req.title}</h3>
+                                            <p className="text-sm text-gray-500 dark:text-slate-300 mb-5 line-clamp-2 leading-relaxed">{req.description}</p>
+
+                                            <div className="flex items-center gap-4 text-xs font-medium text-gray-500 mb-5">
+                                                <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-slate-700 px-2 py-1 rounded border border-gray-100 dark:border-slate-600 dark:text-slate-200">
+                                                    {req.type === 'MEDICAL' && <Stethoscope size={12} />}
+                                                    {req.type === 'BLOOD_BANK' && <Heart size={12} />}
+                                                    {req.type === 'AMBULANCE' && <Ambulance size={12} />}
+                                                    {req.type}
+                                                </div>
+                                                <span className="dark:text-slate-400">{req.location}</span>
+                                            </div>
+
+                                            <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-slate-700">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`w-2 h-2 rounded-full ${req.status === 'OPEN' ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
+                                                    <span className="text-xs font-bold text-gray-700 dark:text-slate-300">{req.status}</span>
+                                                </div>
+                                                <div className="flex -space-x-2">
+                                                    {[...Array(Math.min(3, req.responseCount))].map((_, i) => (
+                                                        <div key={i} className="w-6 h-6 rounded-full bg-gray-200 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[10px] font-bold text-gray-500">
+                                                            {String.fromCharCode(65 + i)}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                            </AnimatePresence>
                         </div>
                     </div>
                 )}
@@ -723,6 +927,7 @@ function DashboardContent() {
                             >
                                 {/* Left Panel: Request Details & Timeline */}
                                 <div className="w-2/3 flex flex-col h-full border-r border-gray-100">
+                                    {/* ... existing Request Details ... */}
                                     <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50">
                                         <div>
                                             <div className="flex items-center gap-2 mb-1">
@@ -775,9 +980,431 @@ function DashboardContent() {
                                     </div>
                                     <div className="flex-1 overflow-y-auto p-6 space-y-6">
                                         <AIMatches matches={viewingRequest.matches || []} />
-
-
                                     </div>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* Resource Modal */}
+                <AnimatePresence>
+                    {isResourceModalOpen && (
+                        <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                                transition={{ type: "spring", duration: 0.4, bounce: 0.3 }}
+                                className="bg-white rounded-[40px] shadow-2xl w-full max-w-lg flex flex-col max-h-[85vh] overflow-hidden"
+                            >
+                                {/* Header */}
+                                <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 shrink-0">
+                                    <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                        <Plus size={20} className="text-blue-600" />
+                                        Add New Resource
+                                    </h3>
+                                    <button
+                                        onClick={() => setIsResourceModalOpen(false)}
+                                        className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-500 hover:text-red-500"
+                                    >
+                                        <X size={24} />
+                                    </button>
+                                </div>
+
+                                {/* Body */}
+                                <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
+                                    <div className="grid grid-cols-2 gap-5">
+                                        <div className="col-span-2">
+                                            <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                <FileText size={14} /> Title / Name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. City Hospital, Dr. Smith"
+                                                className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-gray-900 placeholder:text-gray-400 transition-all outline-none font-medium text-sm"
+                                                value={resourceFormData.title}
+                                                onChange={e => setResourceFormData({ ...resourceFormData, title: e.target.value })}
+                                            />
+                                        </div>
+
+                                        <div className="col-span-1">
+                                            <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                <Activity size={14} /> Type
+                                            </label>
+                                            <div className="relative">
+                                                <select
+                                                    className="w-full appearance-none px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none font-medium cursor-pointer text-sm text-gray-900"
+                                                    value={resourceFormData.type}
+                                                    onChange={e => setResourceFormData({ ...resourceFormData, type: e.target.value as ResourceType })}
+                                                >
+                                                    <option value="DOCTOR">Doctor</option>
+                                                    <option value="HOSPITAL">Hospital</option>
+                                                    <option value="MEDICINE">Medicines</option>
+                                                    <option value="BLOOD_BANK">Blood Bank</option>
+                                                    <option value="AMBULANCE">Ambulance</option>
+                                                    <option value="OXYGEN">Oxygen</option>
+                                                    <option value="SHELTER">Shelter</option>
+                                                </select>
+                                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                                    <Filter size={14} />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="col-span-1">
+                                            <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                <Phone size={14} /> Phone
+                                            </label>
+                                            <input
+                                                type="tel"
+                                                placeholder="Phone Number"
+                                                className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-gray-900 placeholder:text-gray-400 transition-all outline-none font-medium text-sm"
+                                                value={resourceFormData.contact.phone}
+                                                onChange={e => setResourceFormData({ ...resourceFormData, contact: { ...resourceFormData.contact, phone: e.target.value } })}
+                                            />
+                                        </div>
+
+                                        {/* Dynamic Fields based on Type */}
+                                        <AnimatePresence>
+                                            {resourceFormData.type === 'DOCTOR' && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                    className="col-span-2 overflow-hidden p-1"
+                                                >
+                                                    <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                        <Stethoscope size={14} /> Specialty
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="e.g. Cardiologist, Pediatrician"
+                                                        className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-gray-900 placeholder:text-gray-400 transition-all outline-none font-medium text-sm"
+                                                        value={resourceFormData.specialty}
+                                                        onChange={e => setResourceFormData({ ...resourceFormData, specialty: e.target.value })}
+                                                    />
+
+                                                    <div className="flex items-center justify-between bg-blue-50 p-4 rounded-2xl border border-blue-100 mt-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <Shield size={20} className={resourceFormData.isVerified ? "text-blue-600" : "text-gray-400"} />
+                                                            <div>
+                                                                <p className="text-sm font-bold text-gray-900">Verified Resource</p>
+                                                                <p className="text-xs text-gray-500">Is this doctor officially verified?</p>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setResourceFormData({ ...resourceFormData, isVerified: !resourceFormData.isVerified })}
+                                                            className={`w-12 h-6 rounded-full transition-colors relative ${resourceFormData.isVerified ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                                        >
+                                                            <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${resourceFormData.isVerified ? 'translate-x-6' : 'translate-x-0'}`} />
+                                                        </button>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+
+                                            {resourceFormData.type === 'HOSPITAL' && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                    className="col-span-2 overflow-hidden p-1 space-y-4"
+                                                >
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div>
+                                                            <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                                <Building2 size={14} /> General Beds
+                                                            </label>
+                                                            <input
+                                                                type="number"
+                                                                placeholder="0"
+                                                                className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-gray-900 placeholder:text-gray-400 transition-all outline-none font-medium text-sm"
+                                                                value={resourceFormData.hospitalBeds.general || ''}
+                                                                onChange={e => setResourceFormData({
+                                                                    ...resourceFormData,
+                                                                    hospitalBeds: { ...resourceFormData.hospitalBeds, general: parseInt(e.target.value) || 0 }
+                                                                })}
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                                <Activity size={14} /> ICU + Vent
+                                                            </label>
+                                                            <input
+                                                                type="number"
+                                                                placeholder="0"
+                                                                className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-gray-900 placeholder:text-gray-400 transition-all outline-none font-medium text-sm"
+                                                                value={resourceFormData.hospitalBeds.icuVentilator || ''}
+                                                                onChange={e => setResourceFormData({
+                                                                    ...resourceFormData,
+                                                                    hospitalBeds: { ...resourceFormData.hospitalBeds, icuVentilator: parseInt(e.target.value) || 0 }
+                                                                })}
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                                                        <div className="flex items-center gap-3">
+                                                            <Shield size={20} className={resourceFormData.isVerified ? "text-blue-600" : "text-gray-400"} />
+                                                            <div>
+                                                                <p className="text-sm font-bold text-gray-900">Verified Resource</p>
+                                                                <p className="text-xs text-gray-500">Is this hospital officially verified?</p>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setResourceFormData({ ...resourceFormData, isVerified: !resourceFormData.isVerified })}
+                                                            className={`w-12 h-6 rounded-full transition-colors relative ${resourceFormData.isVerified ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                                        >
+                                                            <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${resourceFormData.isVerified ? 'translate-x-6' : 'translate-x-0'}`} />
+                                                        </button>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+
+                                            {resourceFormData.type === 'BLOOD_BANK' && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                    className="col-span-2 overflow-hidden p-1 space-y-4"
+                                                >
+                                                    <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                                        <Heart size={14} /> Blood Stock (Units)
+                                                    </label>
+                                                    <div className="grid grid-cols-4 gap-3">
+                                                        {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((group) => (
+                                                            <div key={group} className="flex flex-col">
+                                                                <span className="text-[10px] font-bold text-gray-400 mb-1 ml-1">{group}</span>
+                                                                <input
+                                                                    type="number"
+                                                                    placeholder="0"
+                                                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:bg-white text-gray-900 text-center font-bold text-sm transition-all outline-none"
+                                                                    value={(resourceFormData.bloodStock as any)[group] || ''}
+                                                                    onChange={e => setResourceFormData({
+                                                                        ...resourceFormData,
+                                                                        bloodStock: { ...resourceFormData.bloodStock, [group]: parseInt(e.target.value) || 0 }
+                                                                    })}
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+
+                                                    <div className="grid grid-cols-2 gap-3">
+                                                        <div className="flex items-center justify-between bg-red-50 p-3 rounded-xl border border-red-100">
+                                                            <span className="text-xs font-bold text-red-700">Plasma</span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setResourceFormData({
+                                                                    ...resourceFormData,
+                                                                    bloodFeatures: { ...resourceFormData.bloodFeatures, plasma: !resourceFormData.bloodFeatures.plasma }
+                                                                })}
+                                                                className={`w-10 h-5 rounded-full transition-colors relative ${resourceFormData.bloodFeatures.plasma ? 'bg-red-500' : 'bg-gray-300'}`}
+                                                            >
+                                                                <div className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-transform ${resourceFormData.bloodFeatures.plasma ? 'translate-x-5' : 'translate-x-0'}`} />
+                                                            </button>
+                                                        </div>
+                                                        <div className="flex items-center justify-between bg-orange-50 p-3 rounded-xl border border-orange-100">
+                                                            <span className="text-xs font-bold text-orange-700">Apheresis</span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setResourceFormData({
+                                                                    ...resourceFormData,
+                                                                    bloodFeatures: { ...resourceFormData.bloodFeatures, apheresis: !resourceFormData.bloodFeatures.apheresis }
+                                                                })}
+                                                                className={`w-10 h-5 rounded-full transition-colors relative ${resourceFormData.bloodFeatures.apheresis ? 'bg-orange-500' : 'bg-gray-300'}`}
+                                                            >
+                                                                <div className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-transform ${resourceFormData.bloodFeatures.apheresis ? 'translate-x-5' : 'translate-x-0'}`} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between bg-blue-50 p-4 rounded-2xl border border-blue-100 mt-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <Shield size={20} className={resourceFormData.isVerified ? "text-blue-600" : "text-gray-400"} />
+                                                            <div>
+                                                                <p className="text-sm font-bold text-gray-900">Verified Resource</p>
+                                                                <p className="text-xs text-gray-500">Is this blood bank officially verified?</p>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setResourceFormData({ ...resourceFormData, isVerified: !resourceFormData.isVerified })}
+                                                            className={`w-12 h-6 rounded-full transition-colors relative ${resourceFormData.isVerified ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                                        >
+                                                            <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${resourceFormData.isVerified ? 'translate-x-6' : 'translate-x-0'}`} />
+                                                        </button>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+
+                                            {resourceFormData.type === 'AMBULANCE' && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                    className="col-span-2 overflow-hidden p-1 space-y-4"
+                                                >
+                                                    <div>
+                                                        <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                            <Truck size={14} /> Ambulance Type
+                                                        </label>
+                                                        <div className="relative">
+                                                            <select
+                                                                className="w-full appearance-none px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none font-medium cursor-pointer text-sm text-gray-900"
+                                                                value={resourceFormData.ambulanceType}
+                                                                onChange={e => setResourceFormData({ ...resourceFormData, ambulanceType: e.target.value })}
+                                                            >
+                                                                <option value="BASIC">Basic Life Support (BLS)</option>
+                                                                <option value="ADVANCED">Advanced Life Support (ALS)</option>
+                                                                <option value="ICU">ICU Transport</option>
+                                                                <option value="NEONATAL">Neonatal / Pediatric</option>
+                                                            </select>
+                                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                                                <Filter size={14} />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                                                        <div className="flex items-center gap-3">
+                                                            <Shield size={20} className={resourceFormData.isVerified ? "text-blue-600" : "text-gray-400"} />
+                                                            <div>
+                                                                <p className="text-sm font-bold text-gray-900">Verified Resource</p>
+                                                                <p className="text-xs text-gray-500">Is this ambulance service officially verified?</p>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setResourceFormData({ ...resourceFormData, isVerified: !resourceFormData.isVerified })}
+                                                            className={`w-12 h-6 rounded-full transition-colors relative ${resourceFormData.isVerified ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                                        >
+                                                            <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${resourceFormData.isVerified ? 'translate-x-6' : 'translate-x-0'}`} />
+                                                        </button>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                            {resourceFormData.type === 'OXYGEN' && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                    className="col-span-2 overflow-hidden p-1 space-y-4"
+                                                >
+                                                    <div>
+                                                        <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                            <Activity size={14} /> Supply Type
+                                                        </label>
+                                                        <div className="grid grid-cols-3 gap-2">
+                                                            {['CYLINDER', 'CONCENTRATOR', 'REFILL'].map((type) => (
+                                                                <button
+                                                                    key={type}
+                                                                    type="button"
+                                                                    onClick={() => setResourceFormData({ ...resourceFormData, oxygenType: type })}
+                                                                    className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${resourceFormData.oxygenType === type
+                                                                        ? 'bg-blue-600 text-white border-blue-600 shadow-md transform scale-105'
+                                                                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                                                        }`}
+                                                                >
+                                                                    {type}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                            <Clock size={14} /> Operating Hours
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            placeholder="e.g. 24x7, 9AM - 9PM"
+                                                            className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-gray-900 placeholder:text-gray-400 transition-all outline-none font-medium text-sm"
+                                                            value={resourceFormData.operatingHours || ''}
+                                                            onChange={e => setResourceFormData({ ...resourceFormData, operatingHours: e.target.value })}
+                                                        />
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                                                        <div className="flex items-center gap-3">
+                                                            <Shield size={20} className={resourceFormData.isVerified ? "text-blue-600" : "text-gray-400"} />
+                                                            <div>
+                                                                <p className="text-sm font-bold text-gray-900">Verified Source</p>
+                                                                <p className="text-xs text-gray-500">Is this oxygen supplier verified?</p>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setResourceFormData({ ...resourceFormData, isVerified: !resourceFormData.isVerified })}
+                                                            className={`w-12 h-6 rounded-full transition-colors relative ${resourceFormData.isVerified ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                                        >
+                                                            <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${resourceFormData.isVerified ? 'translate-x-6' : 'translate-x-0'}`} />
+                                                        </button>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+
+                                        <div className="col-span-2">
+                                            <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                <MapPin size={14} /> Location Details
+                                            </label>
+                                            <div className="grid grid-cols-2 gap-3 mb-3">
+                                                <input
+                                                    type="text"
+                                                    placeholder="City"
+                                                    className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-gray-900 placeholder:text-gray-400 transition-all outline-none font-medium text-sm"
+                                                    value={resourceFormData.location.city}
+                                                    onChange={e => setResourceFormData({ ...resourceFormData, location: { ...resourceFormData.location, city: e.target.value } })}
+                                                />
+                                                <input
+                                                    type="text"
+                                                    placeholder="District"
+                                                    className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-gray-900 placeholder:text-gray-400 transition-all outline-none font-medium text-sm"
+                                                    value={resourceFormData.location.district}
+                                                    onChange={e => setResourceFormData({ ...resourceFormData, location: { ...resourceFormData.location, district: e.target.value } })}
+                                                />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="Full Address"
+                                                className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-gray-900 placeholder:text-gray-400 transition-all outline-none font-medium text-sm"
+                                                value={resourceFormData.location.address}
+                                                onChange={e => setResourceFormData({ ...resourceFormData, location: { ...resourceFormData.location, address: e.target.value } })}
+                                            />
+                                        </div>
+
+                                        <div className="col-span-2">
+                                            <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                <AlignLeft size={14} /> Description
+                                            </label>
+                                            <textarea
+                                                rows={3}
+                                                placeholder="Details about services, specialized equipment, etc."
+                                                className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-gray-900 placeholder:text-gray-400 transition-all outline-none resize-none font-medium text-sm"
+                                                value={resourceFormData.description}
+                                                onChange={e => setResourceFormData({ ...resourceFormData, description: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Footer */}
+                                <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50 shrink-0">
+                                    <button
+                                        onClick={() => setIsResourceModalOpen(false)}
+                                        className="px-6 py-3 text-gray-600 hover:text-gray-900 font-bold transition-colors text-sm hover:bg-gray-100 rounded-2xl"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleSaveResource}
+                                        className="px-8 py-3 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 active:scale-95 text-sm flex items-center gap-2"
+                                    >
+                                        <Plus size={18} fill="currentColor" />
+                                        Add Resource
+                                    </button>
                                 </div>
                             </motion.div>
                         </div>

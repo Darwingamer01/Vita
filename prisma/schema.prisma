@@ -129,8 +129,12 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  password      String?
-  accounts      Account[]
+  password          String?
+  phoneNumber       String?
+  emergencyContacts String? // JSON stringified string[]
+  notificationPreferences String? // JSON: { email: boolean, sms: boolean, push: boolean }
+  pushSubscription  String?   // JSON stringified PushSubscription
+  accounts          Account[]
   sessions      Session[]
 }
 

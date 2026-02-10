@@ -33,6 +33,7 @@ const mapDbResource = (r: DbResource): Resource => {
         status: r.status as AvailabilityStatus,
         verificationLevel: r.verificationLevel as any,
         lastUpdated: r.lastUpdated.toISOString(),
+        createdAt: r.createdAt.toISOString(),
         metadata: r.metadata ? JSON.parse(r.metadata) : undefined,
         reportCount: r.reportCount,
         upvoteCount: r.upvoteCount,
@@ -188,6 +189,11 @@ class DatabaseService {
         return reqs.map(mapDbRequest);
     }
 
+    async getRequestById(id: string): Promise<Request | undefined> {
+        const req = await prisma.request.findUnique({ where: { id } });
+        return req ? mapDbRequest(req) : undefined;
+    }
+
     async createRequest(req: any): Promise<Request> {
         const matches = await this.generateMatches(req);
 
@@ -271,6 +277,16 @@ class DatabaseService {
         return mapDbRequest(updated);
     }
 
+    async deleteRequest(id: string): Promise<boolean> {
+        try {
+            await prisma.request.delete({ where: { id } });
+            return true;
+        } catch (error) {
+            console.error("Failed to delete request", error);
+            return false;
+        }
+    }
+
     async addResource(resource: Partial<Resource>): Promise<Resource> {
         const newResource = await prisma.resource.create({
             data: {
@@ -316,6 +332,16 @@ class DatabaseService {
             return { success: true, newStatus: updated.verificationLevel };
         } catch (error) {
             return { success: false };
+        }
+    }
+
+    async deleteResource(id: string): Promise<boolean> {
+        try {
+            await prisma.resource.delete({ where: { id } });
+            return true;
+        } catch (error) {
+            console.error("Failed to delete resource", error);
+            return false;
         }
     }
 

@@ -14,10 +14,15 @@ export async function POST(request: Request) {
         const newReq = await db.createRequest(body);
 
         // Trigger Real-time Event
-        await pusherServer.trigger('requests-channel', 'new-request', newReq);
+        try {
+            await pusherServer.trigger('requests-channel', 'new-request', newReq);
+        } catch (pusherError) {
+            console.error('Pusher Trigger Error:', pusherError);
+        }
 
         return NextResponse.json(newReq, { status: 201 });
     } catch (e) {
+        console.error('Create Request Error:', e);
         return NextResponse.json({ error: 'Invalid Request' }, { status: 400 });
     }
 }

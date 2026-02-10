@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Map from '@/components/features/Map';
 import ResourceCard from '@/components/features/ResourceCard';
 import { Resource } from '@/types';
-import { Search } from 'lucide-react';
+import { Search, Trash2 } from 'lucide-react';
 import ChatWidget from './ChatWidget';
 import EmergencyButton from './EmergencyButton';
 
@@ -21,6 +21,20 @@ export default function ResourceExplorer({ initialFilter = 'ALL', title, searchQ
     const [filter, setFilter] = useState(initialFilter);
     const [subFilter, setSubFilter] = useState<string | null>(null);
     const [internalSearch, setInternalSearch] = useState(searchQuery);
+
+    const handleDeleteResource = async (id: string) => {
+        try {
+            const res = await fetch(`/api/resources/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setResources(prev => prev.filter(r => r.id !== id));
+            } else {
+                alert("Failed to delete resource");
+            }
+        } catch (error) {
+            console.error("Error deleting resource:", error);
+            alert("Error deleting resource");
+        }
+    };
 
     // Sync internal search if prop changes (Global Search drives this)
     useEffect(() => {
@@ -223,11 +237,24 @@ export default function ResourceExplorer({ initialFilter = 'ALL', title, searchQ
                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.2 } }}
                                     transition={{
-                                        layout: { duration: 0.4, ease: [0.25, 0.4, 0.25, 1] }, // Smooth fluid layout
+                                        layout: { duration: 0.4, ease: [0.25, 0.4, 0.25, 1] },
                                         opacity: { duration: 0.3 }
                                     }}
                                     key={resource.id}
+                                    className="relative group"
                                 >
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (confirm('Are you sure you want to delete this resource?')) {
+                                                handleDeleteResource(resource.id);
+                                            }
+                                        }}
+                                        className="absolute top-2 right-2 z-10 p-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-gray-200 dark:border-slate-700 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+                                        title="Delete Resource"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
                                     <ResourceCard resource={resource} />
                                 </motion.div>
                             ))}

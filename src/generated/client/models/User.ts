@@ -31,6 +31,10 @@ export type UserMinAggregateOutputType = {
   emailVerified: Date | null
   image: string | null
   password: string | null
+  phoneNumber: string | null
+  emergencyContacts: string | null
+  notificationPreferences: string | null
+  pushSubscription: string | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -40,6 +44,10 @@ export type UserMaxAggregateOutputType = {
   emailVerified: Date | null
   image: string | null
   password: string | null
+  phoneNumber: string | null
+  emergencyContacts: string | null
+  notificationPreferences: string | null
+  pushSubscription: string | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -49,6 +57,10 @@ export type UserCountAggregateOutputType = {
   emailVerified: number
   image: number
   password: number
+  phoneNumber: number
+  emergencyContacts: number
+  notificationPreferences: number
+  pushSubscription: number
   _all: number
 }
 
@@ -60,6 +72,10 @@ export type UserMinAggregateInputType = {
   emailVerified?: true
   image?: true
   password?: true
+  phoneNumber?: true
+  emergencyContacts?: true
+  notificationPreferences?: true
+  pushSubscription?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -69,6 +85,10 @@ export type UserMaxAggregateInputType = {
   emailVerified?: true
   image?: true
   password?: true
+  phoneNumber?: true
+  emergencyContacts?: true
+  notificationPreferences?: true
+  pushSubscription?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -78,6 +98,10 @@ export type UserCountAggregateInputType = {
   emailVerified?: true
   image?: true
   password?: true
+  phoneNumber?: true
+  emergencyContacts?: true
+  notificationPreferences?: true
+  pushSubscription?: true
   _all?: true
 }
 
@@ -160,6 +184,10 @@ export type UserGroupByOutputType = {
   emailVerified: Date | null
   image: string | null
   password: string | null
+  phoneNumber: string | null
+  emergencyContacts: string | null
+  notificationPreferences: string | null
+  pushSubscription: string | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -190,6 +218,10 @@ export type UserWhereInput = {
   emailVerified?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   image?: Prisma.StringNullableFilter<"User"> | string | null
   password?: Prisma.StringNullableFilter<"User"> | string | null
+  phoneNumber?: Prisma.StringNullableFilter<"User"> | string | null
+  emergencyContacts?: Prisma.StringNullableFilter<"User"> | string | null
+  notificationPreferences?: Prisma.StringNullableFilter<"User"> | string | null
+  pushSubscription?: Prisma.StringNullableFilter<"User"> | string | null
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
 }
@@ -201,6 +233,10 @@ export type UserOrderByWithRelationInput = {
   emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   password?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContacts?: Prisma.SortOrderInput | Prisma.SortOrder
+  notificationPreferences?: Prisma.SortOrderInput | Prisma.SortOrder
+  pushSubscription?: Prisma.SortOrderInput | Prisma.SortOrder
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
 }
@@ -215,6 +251,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   emailVerified?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   image?: Prisma.StringNullableFilter<"User"> | string | null
   password?: Prisma.StringNullableFilter<"User"> | string | null
+  phoneNumber?: Prisma.StringNullableFilter<"User"> | string | null
+  emergencyContacts?: Prisma.StringNullableFilter<"User"> | string | null
+  notificationPreferences?: Prisma.StringNullableFilter<"User"> | string | null
+  pushSubscription?: Prisma.StringNullableFilter<"User"> | string | null
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
 }, "id" | "email">
@@ -226,6 +266,10 @@ export type UserOrderByWithAggregationInput = {
   emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   password?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContacts?: Prisma.SortOrderInput | Prisma.SortOrder
+  notificationPreferences?: Prisma.SortOrderInput | Prisma.SortOrder
+  pushSubscription?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -241,6 +285,10 @@ export type UserScalarWhereWithAggregatesInput = {
   emailVerified?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   image?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   password?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  phoneNumber?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  emergencyContacts?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  notificationPreferences?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  pushSubscription?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
@@ -250,6 +298,10 @@ export type UserCreateInput = {
   emailVerified?: Date | string | null
   image?: string | null
   password?: string | null
+  phoneNumber?: string | null
+  emergencyContacts?: string | null
+  notificationPreferences?: string | null
+  pushSubscription?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
 }
@@ -261,6 +313,10 @@ export type UserUncheckedCreateInput = {
   emailVerified?: Date | string | null
   image?: string | null
   password?: string | null
+  phoneNumber?: string | null
+  emergencyContacts?: string | null
+  notificationPreferences?: string | null
+  pushSubscription?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
 }
@@ -272,6 +328,10 @@ export type UserUpdateInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContacts?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationPreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushSubscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
 }
@@ -283,6 +343,10 @@ export type UserUncheckedUpdateInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContacts?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationPreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushSubscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -294,6 +358,10 @@ export type UserCreateManyInput = {
   emailVerified?: Date | string | null
   image?: string | null
   password?: string | null
+  phoneNumber?: string | null
+  emergencyContacts?: string | null
+  notificationPreferences?: string | null
+  pushSubscription?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -303,6 +371,10 @@ export type UserUpdateManyMutationInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContacts?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationPreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushSubscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -312,6 +384,10 @@ export type UserUncheckedUpdateManyInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContacts?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationPreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushSubscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserScalarRelationFilter = {
@@ -326,6 +402,10 @@ export type UserCountOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  emergencyContacts?: Prisma.SortOrder
+  notificationPreferences?: Prisma.SortOrder
+  pushSubscription?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -335,6 +415,10 @@ export type UserMaxOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  emergencyContacts?: Prisma.SortOrder
+  notificationPreferences?: Prisma.SortOrder
+  pushSubscription?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -344,6 +428,10 @@ export type UserMinOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  emergencyContacts?: Prisma.SortOrder
+  notificationPreferences?: Prisma.SortOrder
+  pushSubscription?: Prisma.SortOrder
 }
 
 export type UserCreateNestedOneWithoutAccountsInput = {
@@ -385,6 +473,10 @@ export type UserCreateWithoutAccountsInput = {
   emailVerified?: Date | string | null
   image?: string | null
   password?: string | null
+  phoneNumber?: string | null
+  emergencyContacts?: string | null
+  notificationPreferences?: string | null
+  pushSubscription?: string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
 }
 
@@ -395,6 +487,10 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   emailVerified?: Date | string | null
   image?: string | null
   password?: string | null
+  phoneNumber?: string | null
+  emergencyContacts?: string | null
+  notificationPreferences?: string | null
+  pushSubscription?: string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -421,6 +517,10 @@ export type UserUpdateWithoutAccountsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContacts?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationPreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushSubscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
 }
 
@@ -431,6 +531,10 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContacts?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationPreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushSubscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -441,6 +545,10 @@ export type UserCreateWithoutSessionsInput = {
   emailVerified?: Date | string | null
   image?: string | null
   password?: string | null
+  phoneNumber?: string | null
+  emergencyContacts?: string | null
+  notificationPreferences?: string | null
+  pushSubscription?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
 }
 
@@ -451,6 +559,10 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   emailVerified?: Date | string | null
   image?: string | null
   password?: string | null
+  phoneNumber?: string | null
+  emergencyContacts?: string | null
+  notificationPreferences?: string | null
+  pushSubscription?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -477,6 +589,10 @@ export type UserUpdateWithoutSessionsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContacts?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationPreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushSubscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
 }
 
@@ -487,6 +603,10 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContacts?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationPreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushSubscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -537,6 +657,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   emailVerified?: boolean
   image?: boolean
   password?: boolean
+  phoneNumber?: boolean
+  emergencyContacts?: boolean
+  notificationPreferences?: boolean
+  pushSubscription?: boolean
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -549,6 +673,10 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   emailVerified?: boolean
   image?: boolean
   password?: boolean
+  phoneNumber?: boolean
+  emergencyContacts?: boolean
+  notificationPreferences?: boolean
+  pushSubscription?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -558,6 +686,10 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   emailVerified?: boolean
   image?: boolean
   password?: boolean
+  phoneNumber?: boolean
+  emergencyContacts?: boolean
+  notificationPreferences?: boolean
+  pushSubscription?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -567,9 +699,13 @@ export type UserSelectScalar = {
   emailVerified?: boolean
   image?: boolean
   password?: boolean
+  phoneNumber?: boolean
+  emergencyContacts?: boolean
+  notificationPreferences?: boolean
+  pushSubscription?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "password", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "password" | "phoneNumber" | "emergencyContacts" | "notificationPreferences" | "pushSubscription", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
@@ -591,6 +727,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     emailVerified: Date | null
     image: string | null
     password: string | null
+    phoneNumber: string | null
+    emergencyContacts: string | null
+    notificationPreferences: string | null
+    pushSubscription: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1022,6 +1162,10 @@ export interface UserFieldRefs {
   readonly emailVerified: Prisma.FieldRef<"User", 'DateTime'>
   readonly image: Prisma.FieldRef<"User", 'String'>
   readonly password: Prisma.FieldRef<"User", 'String'>
+  readonly phoneNumber: Prisma.FieldRef<"User", 'String'>
+  readonly emergencyContacts: Prisma.FieldRef<"User", 'String'>
+  readonly notificationPreferences: Prisma.FieldRef<"User", 'String'>
+  readonly pushSubscription: Prisma.FieldRef<"User", 'String'>
 }
     
 

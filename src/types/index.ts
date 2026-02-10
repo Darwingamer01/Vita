@@ -100,6 +100,7 @@ export interface Resource {
   status: AvailabilityStatus;
   verificationLevel: VerificationLevel;
   lastUpdated: string; // ISO Date string
+  createdAt: string; // ISO Date string
 
   // Extended Metadata (Union type feel)
   metadata?: {

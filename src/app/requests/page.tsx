@@ -29,7 +29,7 @@ export default function RequestsPage() {
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col items-start gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">Community Requests</h1>
                     <p className="text-gray-600">Real-time needs posted by the community.</p>
@@ -106,9 +106,31 @@ export default function RequestsPage() {
                             <span className="flex items-center gap-1"><Clock size={16} /> {new Date(req.createdAt).toLocaleDateString()}</span>
                         </div>
 
-                        <div className="mt-4 pt-4 border-t border-gray-100 flex gap-2">
-                            <a href={`tel:${req.contact}`} className="btn btn-outline py-1 px-4 text-sm">Call</a>
-                            <a href={`https://wa.me/${req.contact}`} className="btn btn-primary py-1 px-4 text-sm bg-green-600 hover:bg-green-700">WhatsApp</a>
+                        <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center bg-gray-50/50 p-2 rounded-lg">
+                            <div className="flex gap-2">
+                                <a href={`tel:${req.contact}`} className="btn btn-outline py-1 px-4 text-xs h-8">Call</a>
+                                <a href={`https://wa.me/${req.contact}`} className="btn btn-primary py-1 px-4 text-xs h-8 bg-green-600 hover:bg-green-700 border-green-600">WhatsApp</a>
+                            </div>
+                            <button
+                                onClick={async () => {
+                                    if (confirm('Are you sure you want to delete this request?')) {
+                                        try {
+                                            const res = await fetch(`/api/requests/${req.id}`, { method: 'DELETE' });
+                                            if (res.ok) {
+                                                setRequests(requests.filter(r => r.id !== req.id));
+                                            } else {
+                                                alert('Failed to delete request');
+                                            }
+                                        } catch (e) {
+                                            console.error('Delete error', e);
+                                            alert('An error occurred');
+                                        }
+                                    }
+                                }}
+                                className="text-red-500 hover:text-red-700 text-xs font-bold px-3 py-1 rounded hover:bg-red-50 transition-colors"
+                            >
+                                Delete Request
+                            </button>
                         </div>
                     </div>
                 ))}

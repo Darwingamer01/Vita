@@ -176,7 +176,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
             </div>
 
             <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-300 mb-4 pt-3 border-t border-gray-50 dark:border-gray-700">
-                {(resource.verificationLevel === 'OFFICIAL_PARTNER' || resource.verificationLevel === 'NGO') && (
+                {(resource.verificationLevel === 'OFFICIAL_PARTNER' || resource.verificationLevel === 'NGO' || resource.verificationLevel === 'VERIFIED') && (
                     <span className="bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-md font-bold border border-blue-100 dark:border-blue-800 flex items-center gap-1">
                         <ShieldCheck size={12} /> Verified
                     </span>
@@ -186,16 +186,18 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
                         <ShieldCheck size={12} /> Govt
                     </span>
                 )}
-                {!['OFFICIAL_PARTNER', 'NGO', 'GOVERNMENT'].includes(resource.verificationLevel) && (
+                {!['OFFICIAL_PARTNER', 'NGO', 'GOVERNMENT', 'VERIFIED'].includes(resource.verificationLevel) && (
                     <span className="bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-2 py-1 rounded-md font-medium border border-gray-100 dark:border-slate-700 flex items-center gap-1">
                         Unverified
                     </span>
                 )}
 
-                <span className="flex items-center gap-1 ml-auto opacity-60" title="Last Updated">
-                    <Clock size={12} />
-                    {new Date(resource.lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
+                <div className="flex items-center gap-3 ml-auto opacity-60">
+                    <span className="flex items-center gap-1" title="Created At">
+                        <Clock size={12} />
+                        Added {new Date(resource.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                </div>
             </div>
 
             <div className="flex items-center gap-2">

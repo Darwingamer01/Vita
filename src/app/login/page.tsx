@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { Zap, ArrowRight, Lock } from 'lucide-react';
 import GoogleChooserModal from '@/components/auth/GoogleChooserModal';
@@ -13,17 +14,33 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
     const [showGoogleModal, setShowGoogleModal] = useState(false);
     const [showAppleModal, setShowAppleModal] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        // Simulate API call
-        setTimeout(() => {
+        setError('');
+
+        try {
+            const result = await signIn('credentials', {
+                email,
+                password,
+                redirect: false,
+            });
+
+            if (result?.error) {
+                setError('Invalid credentials. Please try again.');
+                setIsLoading(false);
+            } else if (result?.ok) {
+                router.push('/dashboard');
+                router.refresh();
+            }
+        } catch (err) {
+            setError('An error occurred. Please try again.');
             setIsLoading(false);
-            router.push('/dashboard');
-        }, 1500);
+        }
     };
 
     return (
@@ -116,6 +133,12 @@ export default function LoginPage() {
                             <span className="bg-white dark:bg-slate-900 px-3 text-gray-400 font-bold tracking-widest">Or with email</span>
                         </div>
                     </div>
+
+                    {error && (
+                        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded-xl text-sm">
+                            {error}
+                        </div>
+                    )}
 
                     <form onSubmit={handleLogin} className="space-y-6">
                         <div className="space-y-2">

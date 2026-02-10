@@ -30,7 +30,35 @@ export default function EmergencyButton({ isOpen: externalIsOpen, onClose, showT
         } else if (countdown === 0 && !sosSent) {
             // Send SOS
             setSosSent(true);
-            // In real app, call API here
+
+            // Call API
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        fetch('/api/sos/send', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ location: { lat: latitude, lng: longitude } })
+                        }).catch(console.error);
+                    },
+                    (error) => {
+                        console.error("Geo error:", error);
+                        // Send without precise location
+                        fetch('/api/sos/send', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ location: { lat: 0, lng: 0 } })
+                        }).catch(console.error);
+                    }
+                );
+            } else {
+                fetch('/api/sos/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ location: null })
+                }).catch(console.error);
+            }
         }
         return () => clearTimeout(timer);
     }, [isTriggered, countdown, sosSent]);
@@ -42,6 +70,11 @@ export default function EmergencyButton({ isOpen: externalIsOpen, onClose, showT
     };
 
     const handleCancel = () => {
+        // If already sent, notify backend of cancellation/false alarm
+        if (sosSent) {
+            fetch('/api/sos/cancel', { method: 'POST' }).catch(console.error);
+        }
+
         setIsTriggered(false);
         setCountdown(3);
         setSosSent(false);

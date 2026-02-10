@@ -21,30 +21,114 @@ import {
     Globe,
     HelpCircle,
     Eye,
-    EyeOff
+    EyeOff,
+    Trash2,
+    Plus,
+    Save,
+    MapPin,
+    Loader2
 } from 'lucide-react';
+import { useLocation } from '@/contexts/LocationContext';
 
 export default function SettingsPanel() {
+    const { location, address, requestLocation, setManualLocation, isLoading: isLocationLoading } = useLocation();
     const { data: session } = useSession();
+    const [emergencyContacts, setEmergencyContacts] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Manual location state
+    const [manualLat, setManualLat] = useState('');
+    const [manualLng, setManualLng] = useState('');
+
     const [activeTab, setActiveTab] = useState('profile');
     const [showPasswords, setShowPasswords] = useState({
         current: false,
         new: false,
-        confirm: false
     });
+
+    useEffect(() => {
+        if (location) {
+            setManualLat(location.lat.toString());
+            setManualLng(location.lng.toString());
+        }
+    }, [location]);
+
+    useEffect(() => {
+        if (activeTab === 'safety') {
+            const fetchContacts = async () => {
+                setIsLoading(true);
+                try {
+                    const res = await fetch('/api/user/contacts');
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.contacts && data.contacts.length > 0) {
+                            setEmergencyContacts(data.contacts);
+                        } else {
+                            setEmergencyContacts(['']);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch contacts:', error);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+            fetchContacts();
+        }
+    }, [activeTab]);
     const [notifications, setNotifications] = useState({
         email: true,
         push: true,
         sms: false,
         news: true
     });
+
+    // Fetch notification preferences
+    useEffect(() => {
+        if (activeTab === 'notifications' && session?.user?.email) {
+            const fetchPreferences = async () => {
+                try {
+                    const res = await fetch('/api/user/notifications');
+                    if (res.ok) {
+                        const data = await res.json();
+                        setNotifications(prev => ({ ...prev, ...data }));
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch notification preferences:', error);
+                }
+            };
+            fetchPreferences();
+        }
+    }, [activeTab, session]);
+
+    const handleNotificationChange = async (key: string, value: boolean) => {
+        // Optimistic update
+        const newNotifications = { ...notifications, [key]: value };
+        setNotifications(newNotifications);
+
+        if (session?.user?.email) {
+            try {
+                await fetch('/api/user/notifications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newNotifications)
+                });
+            } catch (error) {
+                console.error('Failed to update notification preferences:', error);
+                // Revert on failure (optional, but good UX)
+                setNotifications(prev => ({ ...prev, [key]: !value }));
+            }
+        }
+    };
     const { theme, setTheme } = useTheme();
 
     const tabs = [
         { id: 'profile', label: 'Profile', icon: <User size={18} /> },
+        { id: 'location', label: 'Location', icon: <MapPin size={18} /> },
         { id: 'notifications', label: 'Notifications', icon: <Bell size={18} /> },
         { id: 'security', label: 'Security', icon: <Shield size={18} /> },
         { id: 'appearance', label: 'Appearance', icon: <Palette size={18} /> },
+        { id: 'safety', label: 'Safety', icon: <Smartphone size={18} /> },
     ];
 
     const [user, setUser] = useState({
@@ -340,6 +424,132 @@ export default function SettingsPanel() {
                                     </div>
                                 )}
 
+                                {activeTab === 'location' && (
+                                    <div className="space-y-8">
+                                        <div>
+                                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Location Settings</h3>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Manage your location for accurate emergency resource finding.</p>
+
+                                            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl p-6 mb-8">
+                                                <div className="flex items-start gap-4">
+                                                    <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-800 flex items-center justify-center text-blue-600 dark:text-blue-300 shrink-0">
+                                                        <MapPin size={24} />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <h4 className="text-base font-bold text-gray-900 dark:text-white mb-1">Current Coordinates</h4>
+                                                        <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                                                            <div className="bg-white dark:bg-slate-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold block">Latitude</span>
+                                                                <span className="font-mono text-gray-900 dark:text-white font-medium">{location?.lat.toFixed(6) || 'Not set'}</span>
+                                                            </div>
+                                                            <div className="bg-white dark:bg-slate-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold block">Longitude</span>
+                                                                <span className="font-mono text-gray-900 dark:text-white font-medium">{location?.lng.toFixed(6) || 'Not set'}</span>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            onClick={requestLocation}
+                                                            disabled={isLocationLoading}
+                                                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold transition-colors shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        >
+                                                            {isLocationLoading ? <Loader2 size={16} className="animate-spin" /> : <MapPin size={16} />}
+                                                            Detect My Location
+                                                        </button>
+
+                                                    </div>
+                                                </div>
+
+                                                {/* Detailed Address Display */}
+                                                {address && (
+                                                    <div className="mt-6 border-t border-blue-100 dark:border-blue-800 pt-6">
+                                                        <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Detailed Address</h4>
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                            <div className="bg-white dark:bg-slate-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold block">City / Town</span>
+                                                                <span className="text-gray-900 dark:text-white font-medium truncate block" title={address.Address.city || address.Address.town || address.Address.village || 'N/A'}>
+                                                                    {address.Address.city || address.Address.town || address.Address.village || 'N/A'}
+                                                                </span>
+                                                            </div>
+                                                            <div className="bg-white dark:bg-slate-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold block">State</span>
+                                                                <span className="text-gray-900 dark:text-white font-medium truncate block">
+                                                                    {address.Address.state || 'N/A'}
+                                                                </span>
+                                                            </div>
+                                                            <div className="bg-white dark:bg-slate-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold block">District / County</span>
+                                                                <span className="text-gray-900 dark:text-white font-medium truncate block">
+                                                                    {address.Address.district || address.Address.county || 'N/A'}
+                                                                </span>
+                                                            </div>
+                                                            <div className="bg-white dark:bg-slate-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold block">Pincode</span>
+                                                                <span className="text-gray-900 dark:text-white font-medium truncate block">
+                                                                    {address.Address.postcode || 'N/A'}
+                                                                </span>
+                                                            </div>
+                                                            <div className="bg-white dark:bg-slate-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 sm:col-span-2">
+                                                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold block">Full Country</span>
+                                                                <span className="text-gray-900 dark:text-white font-medium truncate block">
+                                                                    {address.Address.country || 'N/A'}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="border-t border-gray-100 dark:border-gray-700 pt-8">
+                                                <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Manually Set Location</h4>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                                                    If automatic detection isn't accurate, you can manually enter coordinates.
+                                                </p>
+
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Latitude</label>
+                                                        <input
+                                                            type="text"
+                                                            value={manualLat}
+                                                            onChange={(e) => setManualLat(e.target.value)}
+                                                            className="w-full px-4 py-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-900 dark:text-white"
+                                                            placeholder="e.g. 28.6139"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Longitude</label>
+                                                        <input
+                                                            type="text"
+                                                            value={manualLng}
+                                                            onChange={(e) => setManualLng(e.target.value)}
+                                                            className="w-full px-4 py-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-900 dark:text-white"
+                                                            placeholder="e.g. 77.2090"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex justify-end">
+                                                    <button
+                                                        onClick={() => {
+                                                            const lat = parseFloat(manualLat);
+                                                            const lng = parseFloat(manualLng);
+                                                            if (!isNaN(lat) && !isNaN(lng)) {
+                                                                setManualLocation(lat, lng);
+                                                                alert('Location updated successfully!');
+                                                            } else {
+                                                                alert('Please enter valid coordinates.');
+                                                            }
+                                                        }}
+                                                        className="px-6 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg font-bold hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
+                                                    >
+                                                        Update Location
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {activeTab === 'notifications' && (
                                     <div className="space-y-8">
                                         <div>
@@ -363,7 +573,12 @@ export default function SettingsPanel() {
                                                             </div>
                                                         </div>
                                                         <label className="relative inline-flex items-center cursor-pointer">
-                                                            <input type="checkbox" checked={notifications[item.id as keyof typeof notifications]} onChange={() => setNotifications({ ...notifications, [item.id]: !notifications[item.id as keyof typeof notifications] })} className="sr-only peer" />
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={notifications[item.id as keyof typeof notifications]}
+                                                                onChange={(e) => handleNotificationChange(item.id, e.target.checked)}
+                                                                className="sr-only peer"
+                                                            />
                                                             <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                                         </label>
                                                     </div>
@@ -565,6 +780,107 @@ export default function SettingsPanel() {
                                         </div>
                                     </div>
                                 )}
+
+                                {activeTab === 'safety' && (
+                                    <div className="space-y-6">
+                                        <div>
+                                            <h3 className="text-lg font-bold text-gray-900 mb-1">Emergency Contacts</h3>
+                                            <p className="text-sm text-gray-500">Manage the contacts that will be notified when you trigger SOS.</p>
+                                        </div>
+
+                                        <div className="bg-red-50 p-4 rounded-2xl border border-red-100 flex items-start gap-3">
+                                            <div className="bg-red-100 p-2 rounded-full text-red-600 shrink-0">
+                                                <Smartphone size={20} />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold text-red-900">How it works</p>
+                                                <p className="text-xs text-red-700 mt-1">
+                                                    When you press the SOS button, an SMS with your location will be sent to these numbers immediately.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Contact List */}
+                                        <div className="space-y-3">
+                                            {emergencyContacts.map((contact, index) => (
+                                                <div key={index} className="flex gap-2">
+                                                    <div className="relative flex-1">
+                                                        <input
+                                                            type="tel"
+                                                            placeholder="Enter Phone Number"
+                                                            className="w-full pl-4 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:bg-white transition-all outline-none font-medium text-gray-900"
+                                                            value={contact}
+                                                            onChange={(e) => {
+                                                                const newContacts = [...emergencyContacts];
+                                                                newContacts[index] = e.target.value;
+                                                                setEmergencyContacts(newContacts);
+                                                            }}
+                                                        />
+                                                        {emergencyContacts.length > 1 && (
+                                                            <button
+                                                                onClick={() => {
+                                                                    const newContacts = emergencyContacts.filter((_, i) => i !== index);
+                                                                    setEmergencyContacts(newContacts);
+                                                                }}
+                                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors"
+                                                            >
+                                                                <Trash2 size={18} />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="flex gap-3">
+                                            {emergencyContacts.length < 5 && (
+                                                <button
+                                                    onClick={() => setEmergencyContacts([...emergencyContacts, ''])}
+                                                    className="flex-1 py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 font-bold text-sm hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    <Plus size={16} /> Add Contact
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={async () => {
+                                                    setIsLoading(true);
+                                                    const validContacts = emergencyContacts.filter(c => c.trim().length >= 10);
+                                                    try {
+                                                        const res = await fetch('/api/user/contacts', {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({ contacts: validContacts }),
+                                                            credentials: 'include'
+                                                        });
+                                                        const data = await res.json();
+
+                                                        if (res.ok) {
+                                                            alert('Contacts saved successfully!');
+                                                        } else {
+                                                            console.error('Save failed:', data);
+                                                            alert(`Failed to save contacts: ${data.error || 'Unknown error'}`);
+                                                        }
+                                                    } catch (error) {
+                                                        console.error('Error saving contacts:', error);
+                                                        alert(`Error saving contacts: ${error instanceof Error ? error.message : 'Network error'}`);
+                                                    } finally {
+                                                        setIsLoading(false);
+                                                    }
+                                                }}
+                                                disabled={isLoading}
+                                                className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold text-sm hover:bg-red-700 transition-all shadow-lg shadow-red-200 active:scale-95 flex items-center justify-center gap-2"
+                                            >
+                                                {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                                                Save Settings
+                                            </button>
+                                        </div>
+
+                                        <p className="text-xs text-center text-gray-400">
+                                            Please verify that these numbers are active and reachable.
+                                        </p>
+                                    </div>
+                                )}
                             </motion.div>
                         </AnimatePresence>
                     </div>
@@ -580,6 +896,6 @@ export default function SettingsPanel() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
