@@ -83,7 +83,12 @@ export default function ResourceExplorer({ initialFilter = 'ALL', title, searchQ
                     throw new Error(`HTTP error! status: ${res.status}`);
                 }
                 const data = await res.json();
-                setResources(data || []);
+                if (Array.isArray(data)) {
+                    setResources(data);
+                } else {
+                    console.error('[ResourceExplorer] API returned non-array:', data);
+                    setResources([]);
+                }
             } catch (err) {
                 console.warn('Failed to fetch resources, using empty state.', err);
                 setResources([]);

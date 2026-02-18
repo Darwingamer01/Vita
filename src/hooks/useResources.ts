@@ -37,7 +37,12 @@ export function useResources(options: UseResourcesOptions = {}) {
             }
 
             const data = await response.json();
-            setResources(data);
+            if (Array.isArray(data)) {
+                setResources(data);
+            } else {
+                console.error('[useResources] API returned non-array data:', data);
+                setResources([]);
+            }
         } catch (err: any) {
             setError(err.message);
             console.error('[useResources] Error:', err);
