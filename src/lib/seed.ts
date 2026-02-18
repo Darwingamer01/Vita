@@ -1,4 +1,4 @@
-const { PrismaClient } = require('../generated/client/client');
+import { PrismaClient, Resource as DbResource, Request as DbRequest } from '@prisma/client';
 require('dotenv/config');
 
 const prisma = new PrismaClient();
