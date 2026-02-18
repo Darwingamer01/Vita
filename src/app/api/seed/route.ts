@@ -182,7 +182,6 @@ export async function GET() {
                     status: req.status,
                     createdAt: new Date(req.createdAt),
                     responseCount: req.responseCount || 0,
-                    responseCount: req.responseCount || 0,
                     timeline: JSON.stringify([]),
                     matches: JSON.stringify([]),
                     adminNotes: 'Seeded via API'

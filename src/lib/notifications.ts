@@ -13,9 +13,17 @@ const emailTransporter = nodemailer.createTransport({
 });
 
 // Twilio Configuration
-const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
-    ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
-    : null;
+// Twilio Configuration
+let twilioClient: any = null;
+try {
+    if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_ACCOUNT_SID.startsWith('AC')) {
+        twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+    } else {
+        console.warn('[Notifications] Twilio credentials missing or invalid (must start with AC). SMS disabled.');
+    }
+} catch (e) {
+    console.warn('[Notifications] Failed to initialize Twilio client:', e);
+}
 
 // Web Push Configuration
 if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {

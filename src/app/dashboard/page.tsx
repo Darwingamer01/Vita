@@ -1,5 +1,6 @@
 'use client';
 
+import { signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity,
@@ -400,7 +401,7 @@ function DashboardContent() {
                             href: '#',
                             onClick: () => {
                                 if (item.id === 'logout') {
-                                    router.push('/');
+                                    signOut({ callbackUrl: '/' });
                                 } else {
                                     setActiveTab(item.id);
                                 }

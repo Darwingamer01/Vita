@@ -51,8 +51,8 @@ export async function GET(request: Request) {
 
         // Get destinations from resources
         const destinations = resources.map(r => ({
-            lat: r.lat,
-            lng: r.lng
+            lat: r.location.lat,
+            lng: r.location.lng
         }));
 
         try {

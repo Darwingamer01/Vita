@@ -18,7 +18,7 @@ const emailTransporter = nodemailer.createTransport({
 
 // Twilio Configuration
 // Basic check to avoid error if twilio module is loaded but keys missing
-let twilioClient = null;
+let twilioClient: any = null;
 if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
     try {
         twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
@@ -40,7 +40,7 @@ if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
     }
 }
 
-async function sendSMS(to, body) {
+async function sendSMS(to: any, body: any) {
     if (!twilioClient) {
         console.warn('[Notifications] Twilio not configured. Skipping SMS to:', to);
         return false;
@@ -60,7 +60,7 @@ async function sendSMS(to, body) {
     }
 }
 
-async function sendEmail(to, subject, html) {
+async function sendEmail(to: any, subject: any, html: any) {
     if (!process.env.EMAIL_SERVER_USER || !process.env.EMAIL_SERVER_PASSWORD) {
         console.warn('[Notifications] Email not configured. Skipping email to:', to);
         return false;
@@ -81,7 +81,7 @@ async function sendEmail(to, subject, html) {
     }
 }
 
-async function sendSOSAlert(data) {
+async function sendSOSAlert(data: any) {
     const mapLink = `https://www.google.com/maps?q=${data.location.lat},${data.location.lng}`;
     const message = `SOS! ${data.userName} needs help! Location: ${data.location.address || 'Unknown'}. Map: ${mapLink}`;
 

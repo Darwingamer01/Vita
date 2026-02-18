@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { Menu, X, Heart, Activity, Ambulance, Map as MapIcon, Home, Zap, Shield, Search } from 'lucide-react';
+import { Menu, X, Heart, Activity, Ambulance, Map as MapIcon, Zap, Shield, LogOut, User } from 'lucide-react';
 import clsx from 'clsx';
+import { useSession, signOut } from 'next-auth/react';
 
 import VoiceSearch from '@/components/features/VoiceSearch';
 import { Button as MovingBorderButton } from "@/components/ui/moving-border";
@@ -13,6 +14,7 @@ import { Button as MovingBorderButton } from "@/components/ui/moving-border";
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
+    const { data: session, status } = useSession();
 
     // Hide navbar on auth pages and dashboard (dashboard has its own layout)
     if (pathname?.startsWith('/login') || pathname?.startsWith('/signup') || pathname?.startsWith('/dashboard') || pathname === '/privacy' || pathname === '/terms' || pathname === '/about') {
@@ -20,6 +22,8 @@ export default function Navbar() {
     }
 
     const isHome = pathname === '/';
+    const isLoggedIn = status === 'authenticated' && !!session?.user;
+    const isLoading = status === 'loading';
 
     const navItems = [
         { name: 'Live Map', href: '/map', icon: MapIcon },
@@ -39,8 +43,7 @@ export default function Navbar() {
         )}>
             <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                 {/* Logo */}
-                {/* Logo */}
-                <Link href="/" className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 flex items-center gap-2 tracking-tighter">
+                <Link href={isLoggedIn ? "/dashboard" : "/"} className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 flex items-center gap-2 tracking-tighter">
                     <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-500/30">
                         <Zap size={20} className="text-blue-400 fill-current" />
                     </div>
@@ -65,30 +68,65 @@ export default function Navbar() {
                         );
                     })}
 
-                    <div className={clsx("flex items-center gap-4 pl-4", !isHome && "border-l border-white/10")}>
+                    <div className={clsx("flex items-center gap-4 pl-4", !isHome && "border-l border-gray-200 dark:border-white/10")}>
                         {!isHome && <VoiceSearch />}
 
-                        {/* Always show Login/Add, but styled differently on Home */}
-                        <Link href="/login" className={clsx("text-sm font-bold transition-colors", isHome ? "text-white hover:text-blue-400" : "text-gray-700 dark:text-white hover:text-blue-600 dark:hover:text-blue-400")}>Login</Link>
-                        <Link href="/signup">
-                            <MovingBorderButton
-                                borderRadius="1.75rem"
-                                className="bg-gray-900 dark:bg-white/10 text-white border-white/10 hover:bg-gray-800 dark:hover:bg-white/20 text-sm font-bold"
-                                containerClassName="h-10 w-28"
+                        {isLoading ? (
+                            // Session loading — show placeholder to avoid flash
+                            <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse" />
+                        ) : isLoggedIn && isHome ? (
+                            // On landing page: show Go to Dashboard
+                            <Link
+                                href="/dashboard"
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full text-sm font-bold shadow-lg shadow-blue-900/30 transition-colors"
                             >
-                                Sign Up
-                            </MovingBorderButton>
-                        </Link>
+                                Go to Dashboard →
+                            </Link>
+                        ) : isLoggedIn ? (
+                            // On inner pages: show user avatar + logout
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+                                        {session.user?.image ? (
+                                            // eslint-disable-next-line @next/next/no-img-element
+                                            <img src={session.user.image} alt="avatar" className="w-8 h-8 rounded-full object-cover" />
+                                        ) : (
+                                            <User size={16} className="text-blue-600 dark:text-blue-400" />
+                                        )}
+                                    </div>
+                                    <span className="hidden 2xl:block">{session.user?.name?.split(' ')[0]}</span>
+                                </div>
+                                <button
+                                    onClick={() => signOut({ callbackUrl: '/' })}
+                                    className="flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                                >
+                                    <LogOut size={16} />
+                                    <span>Logout</span>
+                                </button>
+                            </div>
+                        ) : (
+                            // Not logged in: show Login + Sign Up
+                            <>
+                                <Link href="/login" className={clsx("text-sm font-bold transition-colors", isHome ? "text-white hover:text-blue-400" : "text-gray-700 dark:text-white hover:text-blue-600 dark:hover:text-blue-400")}>Login</Link>
+                                <Link href="/signup">
+                                    <MovingBorderButton
+                                        borderRadius="1.75rem"
+                                        className="bg-gray-900 dark:bg-white/10 text-white border-white/10 hover:bg-gray-800 dark:hover:bg-white/20 text-sm font-bold"
+                                        containerClassName="h-10 w-28"
+                                    >
+                                        Sign Up
+                                    </MovingBorderButton>
+                                </Link>
+                            </>
+                        )}
 
                         {!isHome && (
-                            <Link href="/add" className="btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg shadow-blue-900/20">
+                            <Link href="/add" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg shadow-blue-900/20 transition-colors">
                                 + Add Resource
                             </Link>
                         )}
                     </div>
                 </div>
-
-
 
                 {/* Mobile Menu Toggle */}
                 <button
@@ -130,26 +168,39 @@ export default function Navbar() {
                                 {!isHome && (
                                     <Link
                                         href="/add"
-                                        className="btn bg-blue-600 text-white py-3 rounded-xl font-bold text-center w-full"
+                                        className="bg-blue-600 text-white py-3 rounded-xl font-bold text-center w-full block"
                                         onClick={() => setIsOpen(false)}
                                     >
                                         + Add Resource
                                     </Link>
                                 )}
-                                <Link
-                                    href="/login"
-                                    className="btn bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white py-3 rounded-xl font-medium text-center w-full"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    Login
-                                </Link>
-                                <Link
-                                    href="/signup"
-                                    className="btn bg-blue-600 text-white py-3 rounded-xl font-medium text-center w-full"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    Sign Up
-                                </Link>
+                                {isLoading ? (
+                                    <div className="w-full h-12 rounded-xl bg-white/10 animate-pulse" />
+                                ) : isLoggedIn ? (
+                                    <button
+                                        onClick={() => { signOut({ callbackUrl: '/' }); setIsOpen(false); }}
+                                        className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 py-3 rounded-xl font-medium text-center w-full flex items-center justify-center gap-2"
+                                    >
+                                        <LogOut size={16} /> Logout ({session.user?.name?.split(' ')[0]})
+                                    </button>
+                                ) : (
+                                    <>
+                                        <Link
+                                            href="/login"
+                                            className="bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white py-3 rounded-xl font-medium text-center w-full block"
+                                            onClick={() => setIsOpen(false)}
+                                        >
+                                            Login
+                                        </Link>
+                                        <Link
+                                            href="/signup"
+                                            className="bg-blue-600 text-white py-3 rounded-xl font-medium text-center w-full block"
+                                            onClick={() => setIsOpen(false)}
+                                        >
+                                            Sign Up
+                                        </Link>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </motion.div>
@@ -158,5 +209,3 @@ export default function Navbar() {
         </nav>
     );
 }
-
-

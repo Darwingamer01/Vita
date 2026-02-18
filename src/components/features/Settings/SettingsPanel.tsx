@@ -44,6 +44,7 @@ export default function SettingsPanel() {
     const [showPasswords, setShowPasswords] = useState({
         current: false,
         new: false,
+        confirm: false
     });
 
     useEffect(() => {
@@ -141,42 +142,47 @@ export default function SettingsPanel() {
     });
 
     useEffect(() => {
-        const stored = localStorage.getItem('vita_user');
-        let parsedUser = null;
-        if (stored) {
-            try {
-                parsedUser = JSON.parse(stored);
-                // Ensure countryCode exists for older stored data
-                if (!parsedUser.countryCode) parsedUser.countryCode = '+1';
+        const loadProfile = async () => {
+            // First set from session immediately so UI isn't blank
+            if (session?.user) {
+                setUser(prev => ({
+                    ...prev,
+                    name: session.user!.name || prev.name,
+                    email: session.user!.email || prev.email,
+                    verified: true,
+                }));
+            }
 
-                // Clean phone number
-                if (parsedUser.phone && parsedUser.phone.startsWith('+')) {
-                    parsedUser.phone = parsedUser.phone.replace(/^\+\d+\s*|[()]/g, '').trim();
+            // Then fetch full profile (including phone + location) from DB
+            try {
+                const res = await fetch('/api/user/profile');
+                if (res.ok) {
+                    const data = await res.json();
+                    setUser(prev => ({
+                        ...prev,
+                        name: data.name || prev.name,
+                        email: data.email || prev.email,
+                        phone: data.phoneNumber || '',
+                        location: data.location || '',
+                        verified: true,
+                    }));
                 }
             } catch (e) {
-                console.error("Failed to parse stored user", e);
+                console.error('Failed to load profile from API', e);
+                // Fallback to localStorage
+                const stored = localStorage.getItem('vita_user');
+                if (stored) {
+                    try {
+                        const parsed = JSON.parse(stored);
+                        if (parsed.email === session?.user?.email) {
+                            setUser(prev => ({ ...prev, ...parsed }));
+                        }
+                    } catch { /* ignore */ }
+                }
             }
-        }
+        };
 
-        if (session?.user) {
-            // Prioritize local storage if it matches the authenticated user
-            if (parsedUser && parsedUser.email === session.user.email) {
-                setUser(parsedUser);
-            } else {
-                // Fallback to session data
-                setUser({
-                    name: session.user.name || 'User',
-                    email: session.user.email || 'user@example.com',
-                    phone: '',
-                    countryCode: '+1',
-                    location: '',
-                    verified: true
-                });
-            }
-        } else if (parsedUser) {
-            // No session, but we have stored data (e.g. guest or just loading)
-            setUser(parsedUser);
-        }
+        loadProfile();
     }, [session]);
 
 
@@ -396,9 +402,29 @@ export default function SettingsPanel() {
 
                                         <div className="flex justify-end pt-4">
                                             <button
-                                                onClick={() => {
-                                                    localStorage.setItem('vita_user', JSON.stringify(user));
-                                                    alert("Profile updated successfully!");
+                                                onClick={async () => {
+                                                    try {
+                                                        const res = await fetch('/api/user/profile', {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({
+                                                                name: user.name,
+                                                                phoneNumber: user.countryCode && user.phone
+                                                                    ? `${user.countryCode} ${user.phone}`
+                                                                    : user.phone,
+                                                                location: user.location,
+                                                            })
+                                                        });
+                                                        if (res.ok) {
+                                                            // Also update localStorage as cache
+                                                            localStorage.setItem('vita_user', JSON.stringify(user));
+                                                            alert('Profile updated successfully!');
+                                                        } else {
+                                                            alert('Failed to save profile. Please try again.');
+                                                        }
+                                                    } catch {
+                                                        alert('Network error. Please try again.');
+                                                    }
                                                 }}
                                                 className="px-6 py-2 bg-black text-white rounded-lg font-bold hover:bg-gray-800 transition-colors shadow-lg shadow-black/10"
                                             >

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 
@@ -13,43 +13,44 @@ interface GoogleChooserProps {
 export default function GoogleChooserModal({ isOpen, onClose }: GoogleChooserProps) {
     const router = useRouter();
 
-    const handleMockLogin = () => {
-        // Simulate network delay then login
-        setTimeout(() => {
-            // Mock Session Data
-            const mockUser = {
-                name: 'Angelixa',
-                email: 'angelixa7005@gmail.com',
-                image: null, // UI Avatars will be used if null
-                verified: true,
-                phone: '+1 (555) 000-0000',
-                location: 'New Delhi, India'
-            };
-
-            // Check if we already have stored data for this user to preserve edits
-            const stored = localStorage.getItem('vita_user');
-            if (stored) {
-                try {
-                    const parsed = JSON.parse(stored);
-                    if (parsed.email === mockUser.email) {
-                        // We have data for this user, keep it!
-                        console.log("Preserving existing user data for", mockUser.email);
-                    } else {
-                        // Different user, overwrite
-                        localStorage.setItem('vita_user', JSON.stringify(mockUser));
-                    }
-                } catch (e) {
-                    // corrupt data, overwrite
+    const handleMockLogin = async () => {
+        // Store mock user data in localStorage for the dashboard profile
+        const mockUser = {
+            name: 'Angelixa',
+            email: 'angelixa7005@gmail.com',
+            image: null,
+            verified: true,
+            phone: '+1 (555) 000-0000',
+            location: 'New Delhi, India'
+        };
+        const stored = localStorage.getItem('vita_user');
+        if (!stored) {
+            localStorage.setItem('vita_user', JSON.stringify(mockUser));
+        } else {
+            try {
+                const parsed = JSON.parse(stored);
+                if (parsed.email !== mockUser.email) {
                     localStorage.setItem('vita_user', JSON.stringify(mockUser));
                 }
-            } else {
-                // No data, set initial mock
+            } catch {
                 localStorage.setItem('vita_user', JSON.stringify(mockUser));
             }
+        }
 
-            onClose();
+        // Create a real NextAuth session so useSession() works everywhere
+        const result = await signIn('credentials', {
+            email: mockUser.email,
+            password: 'demo-password',
+            redirect: false,
+        });
+
+        onClose();
+        if (result?.ok) {
             router.push('/dashboard');
-        }, 800);
+            router.refresh();
+        } else {
+            router.push('/dashboard');
+        }
     };
 
     const handleRealLogin = () => {

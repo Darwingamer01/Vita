@@ -1240,6 +1240,7 @@ export const UserScalarFieldEnum = {
   image: 'image',
   password: 'password',
   phoneNumber: 'phoneNumber',
+  location: 'location',
   emergencyContacts: 'emergencyContacts',
   notificationPreferences: 'notificationPreferences',
   pushSubscription: 'pushSubscription'

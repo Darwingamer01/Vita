@@ -126,6 +126,9 @@ export interface Resource {
   reportCount: number;
   upvoteCount: number;
   distance?: number; // Calculated at runtime
+  duration?: number; // Calculated at runtime (seconds)
+  durationWithoutTraffic?: number;
+  hasTrafficData?: boolean;
 }
 
 export type RequestStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'ESCALATED' | 'CANCELLED' | 'FULFILLED' | 'EXPIRED';

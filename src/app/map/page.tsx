@@ -1,5 +1,9 @@
 import ResourceExplorer from '@/components/features/ResourceExplorer';
 
 export default function MapPage() {
-    return <ResourceExplorer initialFilter="ALL" title="Live Map" />;
+    return (
+        <div className="h-screen pt-16 flex flex-col overflow-hidden">
+            <ResourceExplorer initialFilter="ALL" title="Live Map" />
+        </div>
+    );
 }
