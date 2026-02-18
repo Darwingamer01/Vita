@@ -3,22 +3,20 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  Heart, Activity, Ambulance, Map as MapIcon,
+  Heart, Ambulance, Map as MapIcon,
   Zap, Users, ArrowRight, CheckCircle2, Siren, ChevronRight,
   MessageSquare, Cpu, Stethoscope
 } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import ChatWidget from '@/components/features/ChatWidget';
 import EmergencyButton from '@/components/features/EmergencyButton';
 
 import { useLanguage } from '@/lib/i18n';
 import { LampContainer } from '@/components/ui/lamp';
 import { Cover } from '@/components/ui/cover';
-import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
 import { Button as MovingBorderButton } from "@/components/ui/moving-border";
 import { ExpandableCardDemo } from "@/components/ui/expandable-cards";
-import { AnimatedTestimonials } from "@/components/ui/animated-testimonials";
 import { ThreeDMarquee } from "@/components/ui/3d-marquee";
 
 type Testimonial = {
@@ -77,7 +75,7 @@ export function TestimonialMarquee() {
             key={index}
             className="relative h-60 w-80 shrink-0 overflow-hidden rounded-xl border border-cyan-500/30 bg-slate-800/50 backdrop-blur-md p-6 flex flex-col justify-between hover:border-cyan-300 hover:bg-slate-700/80 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(6,182,212,0.3)]"
           >
-            <p className="text-white text-sm leading-relaxed mb-4 line-clamp-4 font-medium drop-shadow-sm">"{testimonial.quote}"</p>
+            <p className="text-white text-sm leading-relaxed mb-4 line-clamp-4 font-medium drop-shadow-sm">&quot;{testimonial.quote}&quot;</p>
 
             <div className="flex items-center gap-3">
               <div className="relative h-10 w-10 rounded-full overflow-hidden ring-2 ring-cyan-500/40 group-hover:ring-cyan-300 transition-all">
@@ -124,74 +122,10 @@ export default function Home() {
     visible: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.1 } }
   };
 
-  const cardHover: Variants = {
-    rest: { scale: 1, y: 0, filter: "brightness(1)" },
-    hover: {
-      scale: 1.02,
-      y: -5,
-      filter: "brightness(1.1)",
-      transition: {
-        duration: 0.4,
-        ease: "easeOut"
-      }
-    }
-  };
-
   const hospitalPartners = [
     "APOLLO HOSPITALS", "AIIMS DELHI", "FORTIS HEALTHCARE",
     "MAX SUPER SPECIALITY", "MEDANTA", "MANIPAL HOSPITALS",
     "NH NARAYANA", "KOKILABEN AMBANI", "LILAVATI HOSPITAL"
-  ];
-
-  const features = [
-    {
-      title: t.featureMapTitle,
-      desc: t.featureMapDesc,
-      icon: <MapIcon size={32} className="text-white" />,
-      link: "/signup", cta: t.ctaMap,
-      className: "bg-gradient-to-br from-teal-500/20 via-teal-900/40 to-teal-500/20 border-teal-400/50",
-      glow: "group-hover/card:shadow-[0_0_50px_rgba(45,212,191,0.5)]"
-    },
-    {
-      title: "Doctors Available NOW",
-      desc: "Cardio, Neuro, and Peds specialists on-call.",
-      icon: <Stethoscope size={32} className="text-cyan-200" />,
-      link: "/signup", cta: "Find Doctors",
-      className: "bg-gradient-to-br from-cyan-500/20 via-cyan-900/40 to-cyan-500/20 border-cyan-400/50",
-      glow: "group-hover/card:shadow-[0_0_50px_rgba(34,211,238,0.5)]"
-    },
-    {
-      title: "Blood & Oxygen",
-      desc: "Live stock from verified banks. Filter by distance.",
-      icon: <Heart size={32} className="text-violet-200" />,
-      link: "/signup", cta: "Check Stock",
-      className: "bg-gradient-to-br from-violet-500/20 via-violet-900/40 to-violet-500/20 border-violet-400/50",
-      glow: "group-hover/card:shadow-[0_0_50px_rgba(167,139,250,0.5)]"
-    },
-    {
-      title: "Ambulance & Beds",
-      desc: "ICU/Ventilator availability in real-time.",
-      icon: <Ambulance size={32} className="text-indigo-200" />,
-      link: "/signup", cta: "Find Bed/Amb",
-      className: "bg-gradient-to-br from-indigo-500/20 via-indigo-900/40 to-indigo-500/20 border-indigo-400/50",
-      glow: "group-hover/card:shadow-[0_0_50px_rgba(129,140,248,0.5)]"
-    },
-    {
-      title: t.featureAITitle,
-      desc: t.featureAIDesc,
-      icon: <Zap size={32} className="text-fuchsia-200" />,
-      link: "/signup", cta: "Try AI",
-      className: "bg-gradient-to-br from-fuchsia-500/20 via-fuchsia-900/40 to-fuchsia-500/20 border-fuchsia-400/50",
-      glow: "group-hover/card:shadow-[0_0_50px_rgba(232,121,249,0.5)]"
-    },
-    {
-      title: "Community Lifeline",
-      desc: "Broadcast SOS requests. Connect with local volunteers.",
-      icon: <Users size={32} className="text-blue-200" />,
-      link: "/signup", cta: "View Requests",
-      className: "bg-gradient-to-br from-blue-500/20 via-blue-900/40 to-blue-500/20 border-blue-400/50",
-      glow: "group-hover/card:shadow-[0_0_50px_rgba(96,165,250,0.5)]"
-    }
   ];
 
   return (
@@ -269,26 +203,25 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. ZIG-ZAG FEATURE SECTION */}
-      <div className="py-32 space-y-48 container mx-auto px-4 relative z-10">
-
-        {/* FEATURE 1: MASTER MAP */}
-        <motion.section
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={staggerContainer}
-        >
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
+      {/* 3. FEATURE 1: MASTER MAP */}
+      <section className="py-24 relative z-10 overflow-hidden">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="grid lg:grid-cols-2 gap-16 items-center"
+          >
             <motion.div variants={fadeInUp}>
               <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-8 border border-blue-400/20 text-blue-400 shadow-[0_0_30px_rgba(59,130,246,0.15)] backdrop-blur-md transform -rotate-3">
                 <MapIcon size={32} />
               </div>
-              <h2 className="text-5xl md:text-6xl font-black mb-6 tracking-tight leading-tight">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 tracking-tight leading-tight">
                 <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500">God-Mode</span> <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 drop-shadow-lg">Visibility.</span>
               </h2>
-              <p className="text-xl text-blue-100 leading-relaxed mb-8">
+              <p className="text-lg md:text-xl text-blue-100 leading-relaxed mb-8 max-w-lg">
                 The fog of war is gone. Identify critical resources with sub-second latency across 18 unique infrastructure layers.
               </p>
               <ul className="space-y-4 mb-10">
@@ -307,7 +240,7 @@ export default function Home() {
             <motion.div variants={fadeInUp} className="relative group perspective-1000">
               <div className="absolute -inset-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-[2.5rem] blur-[60px] opacity-20 group-hover:opacity-40 transition duration-1000"></div>
               <div className="relative bg-white/5 border border-white/10 rounded-[2rem] p-2 shadow-2xl backdrop-blur-md transform transition-transform duration-700 hover:rotate-1 hover:scale-[1.01]">
-                <div className="relative h-[500px] w-full rounded-[1.8rem] overflow-hidden bg-[#0a0a12]/50">
+                <div className="relative h-[400px] md:h-[500px] w-full rounded-[1.8rem] overflow-hidden bg-[#0a0a12]/50">
                   <Image
                     src="/v4_map_dashboard.png"
                     alt="Vita Live Map Dashboard"
@@ -317,21 +250,24 @@ export default function Home() {
                 </div>
               </div>
             </motion.div>
-          </div>
-        </motion.section>
+          </motion.div>
+        </div>
+      </section>
 
-        {/* FEATURE 2: AI Triage */}
-        <motion.section
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={staggerContainer}
-        >
-          <div className="grid lg:grid-cols-2 gap-20 items-center flex-col-reverse lg:flex-row">
+      {/* 4. FEATURE 2: AI TRIAGE */}
+      <section className="py-24 relative z-10 overflow-hidden bg-white/[0.02]">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="grid lg:grid-cols-2 gap-16 items-center flex-col-reverse lg:flex-row"
+          >
             <motion.div variants={fadeInUp} className="relative group perspective-1000 lg:order-1 order-2">
               <div className="absolute -inset-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-[2.5rem] blur-[60px] opacity-20 group-hover:opacity-40 transition duration-1000"></div>
               <div className="relative bg-white/5 border border-white/10 rounded-[2rem] p-2 shadow-2xl backdrop-blur-md transform transition-transform duration-700 hover:-rotate-1 hover:scale-[1.01]">
-                <div className="relative h-[500px] w-full rounded-[1.8rem] overflow-hidden bg-[#0a0a12]/50">
+                <div className="relative h-[400px] md:h-[500px] w-full rounded-[1.8rem] overflow-hidden bg-[#0a0a12]/50">
                   <Image
                     src="/v4_ai_assistant.png"
                     alt="Vita AI Assistant"
@@ -346,94 +282,94 @@ export default function Home() {
               <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-8 border border-purple-400/20 text-purple-400 shadow-[0_0_30px_rgba(192,132,252,0.15)] backdrop-blur-md transform rotate-3">
                 <Cpu size={32} />
               </div>
-              <h2 className="text-5xl md:text-6xl font-black mb-6 tracking-tight leading-tight">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 tracking-tight leading-tight">
                 <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500">Neural</span> <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 drop-shadow-lg">Prediction.</span>
               </h2>
-              <p className="text-xl text-purple-100 leading-relaxed mb-8">
+              <p className="text-lg md:text-xl text-purple-100 leading-relaxed mb-8 max-w-lg">
                 Processing millions of data points to predict shortages and triage patients before they even reach the ER.
               </p>
               <Link href="/signup" className="group inline-flex items-center gap-2 text-lg font-bold text-purple-400 hover:text-purple-300 transition-colors">
                 Analyze AI Insights <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
-          </div>
-        </motion.section>
+          </motion.div>
+        </div>
+      </section>
 
-
-        {/* FEATURE 3: VIBRANT COLOR GRID SECTION WITH EXPANDABLE CARDS */}
-        <section
-          className="pb-20 relative z-10"
-        >
-          <div className="text-center max-w-3xl mx-auto mb-10">
-            <h2 className="text-4xl md:text-5xl font-black mb-6 text-white drop-shadow-md">The Complete Ecosystem</h2>
-            <p className="text-gray-300 text-lg">Connected intelligence for every stakeholder.</p>
+      {/* 5. COMPLETE ECOSYSTEM */}
+      <section className="py-24 relative z-10">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 text-white drop-shadow-md">The Complete Ecosystem</h2>
+            <p className="text-gray-300 text-lg md:text-xl">Connected intelligence for every stakeholder.</p>
           </div>
 
           <div className="flex flex-col items-center justify-center gap-6 dark">
             <ExpandableCardDemo />
           </div>
-        </section>
-      </div>
-
-      {/* 4. EMERGENCY ACTION SECTION */}
-      <section className="pb-20 px-4 relative z-10">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInUp}
-          className="container mx-auto"
-        >
-          <div className="relative rounded-[3rem] bg-black/40 border border-red-500/20 overflow-hidden p-12 md:p-24 text-center shadow-[0_0_50px_rgba(220,38,38,0.1)] backdrop-blur-xl">
-            <div className="absolute top-[-50%] left-[-20%] w-[800px] h-[800px] bg-red-600/20 blur-[150px] rounded-full animate-pulse mix-blend-screen"></div>
-            <div className="absolute bottom-[-50%] right-[-20%] w-[800px] h-[800px] bg-orange-600/20 blur-[150px] rounded-full animate-pulse mix-blend-screen"></div>
-
-            <div className="relative z-10 max-w-4xl mx-auto">
-              <h2 className="text-5xl md:text-7xl font-black mb-8 text-white tracking-tighter drop-shadow-2xl">Emergency? <br /> <span className="text-red-500">Don't Wait.</span></h2>
-              <p className="text-xl text-gray-100 mb-12 max-w-2xl mx-auto">Skip the login. Trigger the network immediately.</p>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                <MovingBorderButton
-                  borderRadius="1.75rem"
-                  className="bg-red-600 text-white border-red-500 font-bold text-xl"
-                  containerClassName="h-16 w-60"
-                  onClick={() => setIsSOSOpen(true)}
-                >
-                  <span className="flex items-center gap-2">
-                    <Siren className="animate-pulse" size={24} />
-                    TRIGGER SOS
-                  </span>
-                </MovingBorderButton>
-
-                <MovingBorderButton
-                  borderRadius="1.75rem"
-                  className="bg-white/5 text-white border-white/10 font-bold text-xl backdrop-blur-md"
-                  containerClassName="h-16 w-60"
-                  onClick={() => setIsChatOpen(true)}
-                >
-                  <span className="flex items-center gap-2">
-                    <MessageSquare size={24} />
-                    Chat with AI
-                  </span>
-                </MovingBorderButton>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+        </div>
       </section>
 
-      {/* 5. TESTIMONIALS SECTION */}
-      <section className="py-20 relative z-10 overflow-hidden">
-        <div className="container mx-auto px-4 mb-10 text-center">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Voices form the Frontlines</h2>
-          <p className="text-gray-400 mb-8">Real stories from survivors, doctors, and volunteers.</p>
+      {/* 6. EMERGENCY ACTION */}
+      <section className="py-24 relative z-10">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+          >
+            <div className="relative rounded-[3rem] bg-black/40 border border-red-500/20 overflow-hidden p-12 md:p-24 text-center shadow-[0_0_50px_rgba(220,38,38,0.1)] backdrop-blur-xl">
+              <div className="absolute top-[-50%] left-[-20%] w-[800px] h-[800px] bg-red-600/20 blur-[150px] rounded-full animate-pulse mix-blend-screen"></div>
+              <div className="absolute bottom-[-50%] right-[-20%] w-[800px] h-[800px] bg-orange-600/20 blur-[150px] rounded-full animate-pulse mix-blend-screen"></div>
+
+              <div className="relative z-10 max-w-4xl mx-auto">
+                <h2 className="text-5xl md:text-7xl lg:text-8xl font-black mb-8 text-white tracking-tighter drop-shadow-2xl">Emergency? <br /> <span className="text-red-500">Don&apos;t Wait.</span></h2>
+                <p className="text-lg md:text-2xl text-gray-100 mb-12 max-w-2xl mx-auto leading-relaxed">Skip the login. Trigger the network immediately.</p>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                  <MovingBorderButton
+                    borderRadius="1.75rem"
+                    className="bg-red-600 text-white border-red-500 font-bold text-xl"
+                    containerClassName="h-16 w-64"
+                    onClick={() => setIsSOSOpen(true)}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Siren className="animate-pulse" size={24} />
+                      TRIGGER SOS
+                    </span>
+                  </MovingBorderButton>
+
+                  <MovingBorderButton
+                    borderRadius="1.75rem"
+                    className="bg-white/5 text-white border-white/10 font-bold text-xl backdrop-blur-md"
+                    containerClassName="h-16 w-64"
+                    onClick={() => setIsChatOpen(true)}
+                  >
+                    <span className="flex items-center gap-2">
+                      <MessageSquare size={24} />
+                      Chat with AI
+                    </span>
+                  </MovingBorderButton>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 7. TESTIMONIALS SECTION */}
+      <section className="py-24 relative z-10 overflow-hidden bg-white/[0.02]">
+        <div className="container mx-auto px-4 mb-16 text-center">
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Voices from the Frontlines</h2>
+          <p className="text-gray-400 text-lg">Real stories from survivors, doctors, and volunteers.</p>
         </div>
 
         <TestimonialMarquee />
       </section>
 
-      {/* 5. FOOTER */}
+      {/* 8. FOOTER */}
       <footer className="border-t border-white/5 pt-24 pb-12 text-white bg-black/20 backdrop-blur-sm relative z-10">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-12 mb-20 text-center md:text-left">
