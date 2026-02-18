@@ -170,7 +170,13 @@ export async function getBatchDistanceMatrix(
             throw new Error(`API status: ${data.status}`);
         }
 
-        return data.rows[0].elements.map((element: any, index: number) => {
+        const rows = data.rows?.[0];
+        if (!rows || !rows.elements) {
+            console.warn('[DistanceMatrix] Invalid API response structure, using fallback');
+            return destinations.map(dest => fallbackDistance(origin, dest));
+        }
+
+        return rows.elements.map((element: any, index: number) => {
             if (element.status !== 'OK') {
                 return fallbackDistance(origin, destinations[index]);
             }

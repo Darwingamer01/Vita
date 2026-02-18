@@ -82,6 +82,14 @@ function DashboardContent() {
         recentIncidents: [] as any[]
     });
 
+    interface NavItem {
+        id: string;
+        label: string;
+        icon: React.ReactNode;
+        group: string;
+        badge?: string;
+    }
+
     const [resources, setResources] = useState<Resource[]>([]);
 
     useEffect(() => {
@@ -110,6 +118,8 @@ function DashboardContent() {
         fetchResources();
     }, []);
 
+    const [userRequests, setUserRequests] = useState<Request[]>([]);
+
     // Real-time Requests Subscription
     useEffect(() => {
         const channel = pusherClient.subscribe('requests-channel');
@@ -123,15 +133,6 @@ function DashboardContent() {
         };
     }, []);
 
-    interface NavItem {
-        id: string;
-        label: string;
-        icon: React.ReactNode;
-        group: string;
-        badge?: string;
-    }
-
-    const [userRequests, setUserRequests] = useState<Request[]>([]);
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
     const [editingRequest, setEditingRequest] = useState<Request | null>(null);
     const [showFilterMenu, setShowFilterMenu] = useState(false);

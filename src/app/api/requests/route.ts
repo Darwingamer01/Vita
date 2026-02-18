@@ -5,9 +5,12 @@ export async function GET() {
     try {
         const requests = await db.getAllRequests();
         return NextResponse.json(requests);
-    } catch (error) {
-        console.error('Failed to fetch requests:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    } catch (error: any) {
+        console.error('[Requests API] Error:', error);
+        return NextResponse.json({ 
+            error: 'Internal Server Error',
+            message: error.message 
+        }, { status: 500 });
     }
 }
 

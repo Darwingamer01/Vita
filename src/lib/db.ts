@@ -1,6 +1,6 @@
 import { Resource, ResourceType, AvailabilityStatus, Request, Alert, Location } from '@/types';
 import { prisma } from './prisma'; // Singleton instance
-import { Resource as DbResource, Request as DbRequest } from '@/generated/client/client';
+import { Resource as DbResource, Request as DbRequest } from '@prisma/client';
 
 // Simple Haversine Distance (in km)
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -188,7 +188,7 @@ class DatabaseService {
             distance: 2.5, // Mock distance or calculate real if req.location given
             matchScore: r.verificationLevel === 'VERIFIED' ? 95 : 80,
             verificationLevel: r.verificationLevel as any,
-            contact: JSON.parse(r.contact).phone
+            contact: safeJsonParse(r.contact, { phone: '' }).phone
         }))
             .sort((a, b) => b.matchScore - a.matchScore)
             .slice(0, 3);
