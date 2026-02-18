@@ -1437,6 +1437,7 @@ export type ResourceCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * The data used to create many Resources.
    */
   data: Prisma.ResourceCreateManyInput | Prisma.ResourceCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1455,6 +1456,7 @@ export type ResourceCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
    * The data used to create many Resources.
    */
   data: Prisma.ResourceCreateManyInput | Prisma.ResourceCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**

@@ -1251,6 +1251,7 @@ export type RequestCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * The data used to create many Requests.
    */
   data: Prisma.RequestCreateManyInput | Prisma.RequestCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1269,6 +1270,7 @@ export type RequestCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many Requests.
    */
   data: Prisma.RequestCreateManyInput | Prisma.RequestCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**

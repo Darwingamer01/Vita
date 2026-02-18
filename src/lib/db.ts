@@ -15,6 +15,18 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
 }
 function deg2rad(deg: number) { return deg * (Math.PI / 180) }
 
+// Helper for Safe JSON Parse
+function safeJsonParse<T>(json: string | null | undefined, fallback: T): T {
+    if (!json) return fallback;
+    try {
+        const parsed = JSON.parse(json);
+        return parsed === null ? fallback : parsed;
+    } catch (e) {
+        console.error('JSON Parse Error:', e);
+        return fallback;
+    }
+}
+
 // Helper to map DB Resource to App Resource
 const mapDbResource = (r: DbResource): Resource => {
     return {
@@ -29,12 +41,12 @@ const mapDbResource = (r: DbResource): Resource => {
             city: r.city || undefined,
             district: r.district || undefined,
         },
-        contact: JSON.parse(r.contact),
+        contact: safeJsonParse(r.contact, { phone: 'N/A' }),
         status: r.status as AvailabilityStatus,
         verificationLevel: r.verificationLevel as any,
         lastUpdated: r.lastUpdated.toISOString(),
         createdAt: r.createdAt.toISOString(),
-        metadata: r.metadata ? JSON.parse(r.metadata) : undefined,
+        metadata: r.metadata ? safeJsonParse(r.metadata, undefined) : undefined,
         reportCount: r.reportCount,
         upvoteCount: r.upvoteCount,
         distance: undefined // Calculated at runtime if needed
@@ -54,8 +66,8 @@ const mapDbRequest = (r: DbRequest): Request => {
         status: r.status as any,
         createdAt: r.createdAt.toISOString(),
         responseCount: r.responseCount,
-        timeline: JSON.parse(r.timeline),
-        matches: JSON.parse(r.matches),
+        timeline: safeJsonParse(r.timeline, []),
+        matches: safeJsonParse(r.matches, []),
         adminNotes: r.adminNotes || undefined
     };
 };

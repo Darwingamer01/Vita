@@ -5,78 +5,83 @@ import { ResourceType } from '@/types';
 import { getBatchDistanceMatrix } from '@/lib/distanceMatrix';
 
 export async function GET(request: Request) {
-    const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type') as ResourceType | null;
-    const query = searchParams.get('q');
+    try {
+        const { searchParams } = new URL(request.url);
+        const type = searchParams.get('type') as ResourceType | null;
+        const query = searchParams.get('q');
 
-    // Get user location for distance calculation
-    const userLat = searchParams.get('lat');
-    const userLng = searchParams.get('lng');
+        // Get user location for distance calculation
+        const userLat = searchParams.get('lat');
+        const userLng = searchParams.get('lng');
 
-    if (query) {
-        const results = await db.getAllResources({ query });
-        return NextResponse.json(results);
-    }
+        if (query) {
+            const results = await db.getAllResources({ query });
+            return NextResponse.json(results);
+        }
 
-    const bloodGroup = searchParams.get('bloodGroup'); // e.g. "A+"
-    const component = searchParams.get('component'); // e.g. "PLASMA", "PLATELETS"
-    const oxygenType = searchParams.get('oxygenType'); // e.g. "CYLINDER"
+        const bloodGroup = searchParams.get('bloodGroup'); // e.g. "A+"
+        const component = searchParams.get('component'); // e.g. "PLASMA", "PLATELETS"
+        const oxygenType = searchParams.get('oxygenType'); // e.g. "CYLINDER"
 
-    // Construct Metadata Filter
-    const metadataFilter: Record<string, any> = {};
-    if (bloodGroup) {
-        // Query param "A-" becomes db key "bloodStock.groups.A-"
-        // We use 'check_positive' to ensure stock > 0
-        metadataFilter[`bloodStock.groups.${decodeURIComponent(bloodGroup)}`] = 'check_positive';
-    }
-    if (component) {
-        if (component === 'PLASMA') metadataFilter['bloodStock.plasmaAvailable'] = true;
-        if (component === 'PLATELETS') metadataFilter['bloodStock.apheresisAvailable'] = true;
-    }
-    if (oxygenType) {
-        metadataFilter['oxygenType'] = oxygenType;
-    }
+        // Construct Metadata Filter
+        const metadataFilter: Record<string, any> = {};
+        if (bloodGroup) {
+            // Query param "A-" becomes db key "bloodStock.groups.A-"
+            // We use 'check_positive' to ensure stock > 0
+            metadataFilter[`bloodStock.groups.${decodeURIComponent(bloodGroup)}`] = 'check_positive';
+        }
+        if (component) {
+            if (component === 'PLASMA') metadataFilter['bloodStock.plasmaAvailable'] = true;
+            if (component === 'PLATELETS') metadataFilter['bloodStock.apheresisAvailable'] = true;
+        }
+        if (oxygenType) {
+            metadataFilter['oxygenType'] = oxygenType;
+        }
 
-    let resources = await db.getAllResources({
-        type: type || undefined,
-        metadataFilter: Object.keys(metadataFilter).length > 0 ? metadataFilter : undefined
-    });
+        let resources = await db.getAllResources({
+            type: type || undefined,
+            metadataFilter: Object.keys(metadataFilter).length > 0 ? metadataFilter : undefined
+        });
 
-    // If user location is provided, calculate real-time distances
-    if (userLat && userLng) {
-        const userLocation = {
-            lat: parseFloat(userLat),
-            lng: parseFloat(userLng)
-        };
+        // If user location is provided, calculate real-time distances
+        if (userLat && userLng) {
+            const userLocation = {
+                lat: parseFloat(userLat),
+                lng: parseFloat(userLng)
+            };
 
-        // Get destinations from resources
-        const destinations = resources.map(r => ({
-            lat: r.location.lat,
-            lng: r.location.lng
-        }));
-
-        try {
-            // Batch calculate distances using Google Maps Distance Matrix API
-            const distances = await getBatchDistanceMatrix(userLocation, destinations);
-
-            // Enhance resources with real-time distance data
-            resources = resources.map((resource, index) => ({
-                ...resource,
-                distance: distances[index].distance,
-                duration: distances[index].durationInTraffic || distances[index].duration,
-                durationWithoutTraffic: distances[index].duration,
-                hasTrafficData: !!distances[index].durationInTraffic
+            // Get destinations from resources
+            const destinations = resources.map(r => ({
+                lat: r.location.lat,
+                lng: r.location.lng
             }));
 
-            // Sort by duration (fastest first)
-            resources.sort((a, b) => (a.duration || 999) - (b.duration || 999));
-        } catch (error) {
-            console.error('[Resources API] Distance calculation error:', error);
-            // Continue without distance data if API fails
-        }
-    }
+            try {
+                // Batch calculate distances using Google Maps Distance Matrix API
+                const distances = await getBatchDistanceMatrix(userLocation, destinations);
 
-    return NextResponse.json(resources);
+                // Enhance resources with real-time distance data
+                resources = resources.map((resource, index) => ({
+                    ...resource,
+                    distance: distances[index].distance,
+                    duration: distances[index].durationInTraffic || distances[index].duration,
+                    durationWithoutTraffic: distances[index].duration,
+                    hasTrafficData: !!distances[index].durationInTraffic
+                }));
+
+                // Sort by duration (fastest first)
+                resources.sort((a, b) => (a.duration || 999) - (b.duration || 999));
+            } catch (error) {
+                console.error('[Resources API] Distance calculation error:', error);
+                // Continue without distance data if API fails
+            }
+        }
+
+        return NextResponse.json(resources);
+    } catch (error) {
+        console.error('[Resources API] Failed to fetch resources:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
 }
 
 export async function POST(request: Request) {
