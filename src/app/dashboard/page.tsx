@@ -96,9 +96,15 @@ function DashboardContent() {
             try {
                 const res = await fetch('/api/resources');
                 const data = await res.json();
-                setResources(data);
+                if (Array.isArray(data)) {
+                    setResources(data);
+                } else {
+                    console.error('[Dashboard] Resources API returned non-array:', data);
+                    setResources([]);
+                }
             } catch (error) {
                 console.error('Failed to fetch resources:', error);
+                setResources([]);
             }
         };
         fetchResources();
@@ -137,9 +143,15 @@ function DashboardContent() {
         try {
             const res = await fetch('/api/requests');
             const data = await res.json();
-            setUserRequests(data);
+            if (Array.isArray(data)) {
+                setUserRequests(data);
+            } else {
+                console.error('[Dashboard] Requests API returned non-array:', data);
+                setUserRequests([]);
+            }
         } catch (error) {
             console.error('Failed to fetch requests:', error);
+            setUserRequests([]);
         }
     };
 
