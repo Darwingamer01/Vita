@@ -27,7 +27,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} antialiased selection:bg-blue-500/30`}>
         {/* Mobile Restriction Overlay */}
-        <div className="fixed inset-0 z-[99999] bg-black flex items-center justify-center lg:hidden">
+        <div 
+          className="fixed inset-0 z-[100] bg-black flex items-center justify-center lg:hidden"
+          role="alert"
+          aria-live="assertive"
+        >
           <div className="text-center p-8 max-w-md">
             <div className="mb-6 flex justify-center">
               <div className="p-4 bg-white/5 rounded-full ring-1 ring-white/10">
